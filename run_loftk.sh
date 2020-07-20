@@ -1,6 +1,6 @@
 #! /bin/bash
 
-for i in XXXXX  ### Cohort 
+for i in XXXXXX  ### Cohort 
 do 
     echo $i
     IN=/hpc/dhl_ec/aalasiri/lof/Imputation/$i/Imputation     ### path to imputation files (output from IMPUTE2)
