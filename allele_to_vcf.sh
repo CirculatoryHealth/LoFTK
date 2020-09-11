@@ -1,5 +1,6 @@
-#! /bin/bash
+#!/bin/bash
 set -e
+
 
 ### Creating display functions
 ### Setting colouring
@@ -87,7 +88,7 @@ else
 
     ### PROJECT SPECIFIC 
     ROOTDIR=${ROOTDIR} # the root directory, e.g. /hpc/dhl_ec/svanderlaan/projects/test_lof
-    PROJECTNAME=${PROJECTNAME} # e.g. "ukb"
+    PROJECTNAME=${PROJECTNAME} # e.g. "WES_ukb_5K"
     haps=`ls -1 ${ROOTDIR}/*haps.gz 2>/dev/null | wc -l`
     allele_probs=`ls -1 ${ROOTDIR}/*allele_probs.gz 2>/dev/null | wc -l`
     info=`ls -1 ${ROOTDIR}/*info 2>/dev/null | wc -l`
@@ -108,14 +109,12 @@ else
     PROJECTDIR=${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF # where you want stuff to be save inside the rootdir
     echo ${PROJECTNAME}
 
-#    for chr in 21
-    for chr in ${CHROMOSOMES}
-    do
-        echo $chr
-
 #=========================================#
 #### Preparation of imputation files  #####
 #=========================================#
+    for chr in ${CHROMOSOMES}
+    do
+        echo "chr "$chr""
 	if [ ! -d ${PROJECTDIR}/vcf_chr"$chr" ]; then
 	    echo "The ${PROJECTDIR}/vcf_chr"$chr" directory doesn't exist; Mr. Bourne will make it for you."
 	    mkdir -v ${PROJECTDIR}/vcf_chr"$chr"
@@ -153,28 +152,37 @@ else
             (( start += 5 ))
         done
 ### This does not work with csh, manually!
-        find ${PROJECTDIR}/vcf_chr*/ -name "*_GoNL_1KG_chr*Mb_allele_probs.gz" -size -65c -delete
+        find ${PROJECTDIR}/vcf_chr*/ -name "*_GoNL_1KG_chr*Mb_allele_probs.gz" -size -70c -delete
 
 #=========================================#
 #### Preparation of imputation files  #####
 #=========================================#
 ### Run allele_probs_to_vcf in all folders
         cp ${loftk}/allele_probs_to_vcfs.pl ${PROJECTDIR}/vcf_chr"$chr"/
-        echo "perl allele_probs_to_vcfs.pl -v" > ${PROJECTDIR}/vcf_chr"$chr"/run_allele_probs_to_vcf_${PROJECTNAME}_chr"$chr".sh
+	echo "#!/bin/bash" > ${PROJECTDIR}/vcf_chr"$chr"/run_allele_probs_to_vcf_${PROJECTNAME}_chr"$chr".sh
+
+        echo "perl allele_probs_to_vcfs.pl -v" >> ${PROJECTDIR}/vcf_chr"$chr"/run_allele_probs_to_vcf_${PROJECTNAME}_chr"$chr".sh
         echo "gzip *.vcf" >> ${PROJECTDIR}/vcf_chr"$chr"/run_allele_probs_to_vcf_${PROJECTNAME}_chr"$chr".sh
-        qsub -S /bin/sh -N allele_probs_to_vcf_${PROJECTNAME}_chr"$chr" -e allele_probs_to_vcf_${PROJECTNAME}_chr"$chr".errors -o allele_probs_to_vcf_${PROJECTNAME}_chr"$chr".log  -l h_rt=4:00:00 -wd ${PROJECTDIR}/vcf_chr"$chr" ${PROJECTDIR}/vcf_chr"$chr"/run_allele_probs_to_vcf_${PROJECTNAME}_chr"$chr".sh
+
+	sbatch --job-name=allele_probs_to_vcf_${PROJECTNAME}_chr"$chr" -e allele_probs_to_vcf_${PROJECTNAME}_chr"$chr".errors -o allele_probs_to_vcf_${PROJECTNAME}_chr"$chr".log -t 02:00:00 -D ${PROJECTDIR}/vcf_chr"$chr" ${PROJECTDIR}/vcf_chr"$chr"/run_allele_probs_to_vcf_${PROJECTNAME}_chr"$chr".sh
+
         sleep 1
 	
     done
-
+    
     for chr in ${CHROMOSOMES}
     do
 	prob_files=`ls -1 ${PROJECTDIR}/vcf_chr"$chr"/*allele_probs.gz 2>/dev/null | wc -l`
 	vcf_files=`ls -1 ${PROJECTDIR}/vcf_chr"$chr"/*vcf.gz 2>/dev/null | wc -l`
 	importantnote "Converting IMPUTE2 files to VCF files"
 	while [ ${prob_files} -ne ${vcf_files} ]; do
+	    importantnote "Converting IMPUTE2 files to VCF files"
 	    sleep 40
+	    echo "${prob_files}"
 	    vcf_files=`ls -1 ${PROJECTDIR}/vcf_chr21/*vcf.gz 2>/dev/null | wc -l`
+	    echo "${vcf_files}"
 	done
     done
+
+
 fi

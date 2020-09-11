@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/bash
 set -e
 
 ### Creating display functions
@@ -112,7 +112,8 @@ else
     ROOTDIR=${ROOTDIR} # the root directory, e.g. /hpc/dhl_ec/aalasiri/projects/test_lof
     PROJECTNAME=${PROJECTNAME} # e.g. "ukb"
     loftk=${LOFTOOLKIT}
-
+    
+    ### Set up directory for VCF files
     if [ ! -d ${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF ]; then
         echo "The project directory doesn't exist; Mr. Bourne will make it for you."
         mkdir -v ${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF
@@ -120,10 +121,11 @@ else
 	
         echo "The project directory '${ROOTDIR}/${PROJECTNAME}' already exists."
     fi
-
+    
+    ### Annotation of LoF 
     for chr in ${CHROMOSOMES}
     do
-
+	echo "chr ${chr}"
 	if [ ${FILE_FORMAT} == "IMPUTE2" ]; then
 	    PROJECTDIR=${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF # where you want stuff to be save inside the rootdir
 	    echo "${PROJECTNAME}"
@@ -135,10 +137,7 @@ else
 	    elif [ "$(ls -A ${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF/vcf_chr"$chr")" ]; then
 		rm ${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF/vcf_chr"$chr"/*
 	    else
-		echoerrorflash "                        *** ERROR *** "
-		echoerrorflash "There is an issue to create or empity this file: ${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF/vcf_chr"$chr". "
-		echoerrorflash "                *** END OF ERROR MESSAGE *** "
-		exit 1
+		echoerrorflash "This dirwctory was empity from the beginning: ${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF/vcf_chr"$chr". "
             fi
 	    
 	    PROJECTDIR=${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF/vcf_chr"$chr"
@@ -163,19 +162,24 @@ else
 #	    for c in ${PROJECTDIR}/*.phased.vcf.gz
 
 	    do
-		if [ ! -e ${c%.gz}.vep.vcf.gz ]; then
+		if [ ! -e ${c%%.gz}.vep.vcf.gz ]; then
                     echo $c
-                    echo ${c%.gz}.vep.vcf
-                    echo ${c%.vcf.gz}_${count}.sh
+                    echo ${c%%.gz}.vep.vcf
+                    echo ${c%%.vcf.gz}_${count}.sh
 		    
-		    echo "${VEP} --input_file $c --output_file ${c%.gz}.vep.vcf --vcf --offline --phased --assembly GRCh37 -plugin LoF,loftee_path:${LOFTEE},human_ancestor_fa:${HUMAN_ANCESTOR_FA},conservation_file:${CONSERVATION_FILE} --dir_plugins ${LOFTEE} --cache --dir_cache ${CACHEDIR} -port 3337 --force_overwrite" > ${c%.vcf.gz}_${count}.sh
-
+		    echo "#!/bin/bash" > ${c%%.vcf.gz}_${count}.sh
+		    echo "${VEP} --input_file $c --output_file ${c%.gz}.vep.vcf --vcf --offline --phased --assembly GRCh37 -plugin LoF,loftee_path:${LOFTEE},human_ancestor_fa:${HUMAN_ANCESTOR_FA},conservation_file:${CONSERVATION_FILE} --dir_plugins ${LOFTEE} --cache --dir_cache ${CACHEDIR} -port 3337 --force_overwrite" >> ${c%%.vcf.gz}_${count}.sh
 		    echo "gzip $c " >> ${c%.vcf.gz}_${count}.sh
-		    echo "gzip ${c%.gz}.vep.vcf " >> ${c%.vcf.gz}_${count}.sh
+		    echo "gzip ${c%.gz}.vep.vcf " >> ${c%%.vcf.gz}_${count}.sh
 		    if [ ${FILE_FORMAT} == "IMPUTE2" ]; then #@# why ? YES I got it, because we have to wait for converting impute data to VCF
-			qsub -S /bin/sh -N VEP_${PROJECTNAME}_chr"$chr"_$count -hold_jid allele_probs_to_vcf_${PROJECTNAME}_chr* -e VEP_${PROJECTNAME}_chr"$chr"_$count.error -o VEP_${PROJECTNAME}_chr"$chr"_$count.log -l h_rt=1:00:00 -wd ${VCFDIR} ${c%.vcf.gz}_${count}.sh
+			PROBDEPENDACY=$(squeue -u aalasiri | cat | awk '{print $1}' | tail -n +2 | ${loftk}/transpose.pl | sed 's/\t/,/g')
+		        echo ${PROBDEPENDACY}
+
+			sbatch --job-name=VEP_${PROJECTNAME}_chr"$chr"_$count --dependency=afterok:${PROBDEPENDACY} -e VEP_${PROJECTNAME}_chr"$chr"_$count.error -o VEP_${PROJECTNAME}_chr"$chr"_$count.log -t 01:00:00 -D ${VCFDIR} ${c%%.vcf.gz}_${count}.sh
+			
 		    elif [ ${FILE_FORMAT} == "VCF" ]; then 
-			qsub -S /bin/sh -N VEP_${PROJECTNAME}_chr"$chr"_$count -e VEP_${PROJECTNAME}_chr"$chr"_$count.error -o VEP_${PROJECTNAME}_chr"$chr"_$count.log -l h_rt=1:00:00 -wd ${VCFDIR} ${c%.vcf.gz}_${count}.sh
+			sbatch --job-name=VEP_${PROJECTNAME}_chr"$chr"_$count -e VEP_${PROJECTNAME}_chr"$chr"_$count.error -o VEP_${PROJECTNAME}_chr"$chr"_$count.log -t 01:00:00 -D ${VCFDIR} ${c%%.vcf.gz}_${count}.sh
+
 		    else
 			echoerrorflash "                        *** ERROR *** "
 			echoerrorflash "Something went wrong. You must have to set the FILE_FORMAT in LoF_config to either IMPUTE2 or VCF. "
@@ -199,11 +203,14 @@ else
                     echo $c
                     echo ${c%.gz}.vep.vcf
                     echo ${c%.vcf.gz}_${count}.sh
-		    
-                    echo "${VEP} --input_file $c --output_file ${c%.gz}.vep.vcf --vcf --offline --phased --assembly GRCh38 -plugin LoF,loftee_path:${LOFTEE},human_ancestor_fa:${HUMAN_ANCESTOR_FA},conservation_file:${CONSERVATION_FILE},gerp_bigwig:${GERP_BIGWIG} --dir_plugins ${LOFTEE} --cache --dir_cache ${CACHEDIR} --force_overwrite" > ${c%.vcf.gz}_${count}.sh
+
+		    echo "#!/bin/bash" > ${c%%.vcf.gz}_${count}.sh
+                    echo "${VEP} --input_file $c --output_file ${c%.gz}.vep.vcf --vcf --offline --phased --assembly GRCh38 -plugin LoF,loftee_path:${LOFTEE},human_ancestor_fa:${HUMAN_ANCESTOR_FA},conservation_file:${CONSERVATION_FILE},gerp_bigwig:${GERP_BIGWIG} --dir_plugins ${LOFTEE} --cache --dir_cache ${CACHEDIR} --force_overwrite" >> ${c%.vcf.gz}_${count}.sh
 		    echo "gzip $c " >> ${c%.vcf.gz}_${count}.sh
                     echo "gzip ${c%.gz}.vep.vcf " >> ${c%.vcf.gz}_${count}.sh
-                    qsub -S /bin/sh -N VEP_${PROJECTNAME}_chr"$chr"_$count -e VEP_${PROJECTNAME}_chr"$chr"_$count.error -o VEP_${PROJECTNAME}_chr"$chr"_$count.log -l h_rt=1:00:00 -wd ${VCFDIR} ${c%.vcf.gz}_${count}.sh
+
+		    sbatch --job-name=VEP_${PROJECTNAME}_chr"$chr"_$count -e VEP_${PROJECTNAME}_chr"$chr"_$count.error -o VEP_${PROJECTNAME}_chr"$chr"_$count.log -t 01:00:00 -D ${VCFDIR} ${c%%.vcf.gz}_${count}.sh
+
                     sleep 5
                     ((count++))
                 fi # if vep.vcf.gz already there
@@ -225,20 +232,6 @@ else
         echo "The OUTPUT directory '${ROOTDIR}/${PROJECTNAME}_LoF_output' already exists."
     fi
 
-#    for chr in $(seq 19 21)
-#    do
-#	vcf_files=`ls -1 ${VCFDIR}/*vcf.gz 2>/dev/null | wc -l`
-#	vep_vcf_files=`ls -1 ${VCFDIR}/*vep.vcf.gz 2>/dev/null | wc -l`
-#	importantnote "Converting IMPUTE2 files to VCF files"
-#	while [ ${vcf_files} -ne ${vep_vcf_files} ]; do
-#           importantnote "LoF annotation using VEP along with LOFTEE"
-#            sleep 40
-#           echo "${prob_files}"
-#            vcf_files=`ls -1 ${PROJECTDIR}/vcf_chr21/*vcf.gz 2>/dev/null | wc -l`
-#           echo "${vcf_files}"
-#        done
-#    done
-
 ### STEP 2 ###
 
     if [ ${ASSEMBLY} == "GRCh37" ]; then
@@ -248,8 +241,9 @@ else
 #### Genes containing LoF variants #####
 
 #======================================#
-	    echo "mv ${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF/vcf_chr*/*vep.vcf.gz ${OUTPUTDIR}" > ${OUTPUTDIR}/run_vep_to_lof_gene.sh
-	    
+	    echo "#!/bin/bash" > ${OUTPUTDIR}/run_vep_to_lof_gene.sh
+	    echo "mv ${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF/vcf_chr*/*vep.vcf.gz ${OUTPUTDIR}" >> ${OUTPUTDIR}/run_vep_to_lof_gene.sh
+
 	    if [ ${FILE_FORMAT} == "IMPUTE2" ]; then
 		cp ${loftk}/vep_vcf_to_gene_lofs.pl ${OUTPUTDIR}
 		echo "sleep 15" >> ${OUTPUTDIR}/run_vep_to_lof_gene.sh
@@ -267,13 +261,17 @@ else
 
 	    echo "${PERL} ${loftk}/gene_lofs_to_gene_lof_counts.pl ${OUTPUTDIR}/${PROJECTNAME}_gene.lof ${OUTPUTDIR}/${PROJECTNAME}_gene.counts" >> ${OUTPUTDIR}/run_vep_to_lof_gene.sh
 	    echo "${PERL} ${loftk}/gene_lofs_to_lof_snps.pl ${OUTPUTDIR}/${PROJECTNAME}_gene.lof ${OUTPUTDIR}/${PROJECTNAME}_gene.lof.snps" >> ${OUTPUTDIR}/run_vep_to_lof_gene.sh
-	    
-	    qsub -S /bin/sh -N LoF_gene_${PROJECTNAME} -hold_jid VEP_${PROJECTNAME}_chr* -e LoF_gene_${PROJECTNAME}.error -o LoF_gene_${PROJECTNAME}.log -l h_rt=1:00:00 -wd ${OUTPUTDIR} ${OUTPUTDIR}/run_vep_to_lof_gene.sh
+
+	    VEPDEPENDACY=$(squeue -u aalasiri | cat | awk '{print $1}' | tail -n +2 | ${loftk}/transpose.pl | sed 's/\t/,/g')
+            echo "Job ID: ${VEPDEPENDACY}"
+	    sbatch --job-name=LoF_gene_${PROJECTNAME} --dependency=afterok:${VEPDEPENDACY} -e LoF_gene_${PROJECTNAME}.error -o LoF_gene_${PROJECTNAME}.log -t 01:00:00 -D ${OUTPUTDIR} ${OUTPUTDIR}/run_vep_to_lof_gene.sh
+
 
 #=====================#
 #### LoF variants #####
 #=====================#
-	    echo "sleep 15" > ${OUTPUTDIR}/run_vep_to_lof_snp.sh
+	    echo "#!/bin/bash" > ${OUTPUTDIR}/run_vep_to_lof_snp.sh
+	    echo "sleep 15" >> ${OUTPUTDIR}/run_vep_to_lof_snp.sh
 	    if [ ${FILE_FORMAT} == "IMPUTE2" ]; then
 		cp ${loftk}/vep_vcf_to_snp_lofs.pl ${OUTPUTDIR}
 		echo "${PERL} vep_vcf_to_snp_lofs.pl -v -o ${PROJECTNAME}_snp.lof" >> ${OUTPUTDIR}/run_vep_to_lof_snp.sh
@@ -288,8 +286,10 @@ else
             fi
 	    
 	    echo "${PERL} ${loftk}/snp_lofs_to_snp_lof_counts.pl ${OUTPUTDIR}/${PROJECTNAME}_snp.lof ${OUTPUTDIR}/${PROJECTNAME}_snp.counts" >> ${OUTPUTDIR}/run_vep_to_lof_snp.sh
-	    qsub -S /bin/sh -N LoF_snp_${PROJECTNAME} -hold_jid VEP_${PROJECTNAME}_chr* -e LoF_snp_${PROJECTNAME}.error -o LoF_snp_${PROJECTNAME}.log -l h_rt=1:00:00 -wd ${OUTPUTDIR} ${OUTPUTDIR}/run_vep_to_lof_snp.sh
 	    
+	    VEPDEPENDACY=$(squeue -u aalasiri | cat | awk '{print $1}' | tail -n +2 | ${loftk}/transpose.pl | sed 's/\t/,/g')
+            echo "Job ID: ${VEPDEPENDACY}"
+	    sbatch --job-name=LoF_snp_${PROJECTNAME} --dependency=afterok:${VEPDEPENDACY} -e LoF_snp_${PROJECTNAME}.error -o LoF_snp_${PROJECTNAME}.log -t 01:00:00 -D ${OUTPUTDIR} ${OUTPUTDIR}/run_vep_to_lof_snp.sh
 
     elif [ ${ASSEMBLY} == "GRCh38" ]; then
             echo "Genes list with high-confidence loss-of-function mutations."
@@ -297,8 +297,8 @@ else
 #======================================#
 #### Genes containing LoF variants #####
 #======================================#
-
-	    echo "mv ${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF/vcf_chr*/*vep.vcf.gz ${OUTPUTDIR}" > ${OUTPUTDIR}/run_vep_to_lof_gene.sh
+	    echo "#!/bin/bash" > ${OUTPUTDIR}/run_vep_to_lof_gene.sh
+	    echo "mv ${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF/vcf_chr*/*vep.vcf.gz ${OUTPUTDIR}" >> ${OUTPUTDIR}/run_vep_to_lof_gene.sh
 	    echo "sleep 15" >> ${OUTPUTDIR}/run_vep_to_lof_gene.sh
 
 	    if [ ${FILE_FORMAT} == "IMPUTE2" ]; then
@@ -314,16 +314,18 @@ else
                 echoerrorflash "                *** END OF ERROR MESSAGE *** "
                 exit 1
             fi
-	       
+
             echo "${PERL} ${loftk}/gene_lofs_to_gene_lof_counts.pl ${OUTPUTDIR}/${PROJECTNAME}_gene.lof ${OUTPUTDIR}/${PROJECTNAME}_gene.counts" >> ${OUTPUTDIR}/run_vep_to_lof_gene.sh
             echo "${PERL} ${loftk}/gene_lofs_to_lof_snps.pl ${OUTPUTDIR}/${PROJECTNAME}_gene.lof ${OUTPUTDIR}/${PROJECTNAME}_gene.lof.snps" >> ${OUTPUTDIR}/run_vep_to_lof_gene.sh
-	    
-            qsub -S /bin/sh -N LoF_gene_${PROJECTNAME} -hold_jid VEP_${PROJECTNAME}_chr* -e LoF_gene_${PROJECTNAME}.error -o LoF_gene_${PROJECTNAME}.log -l h_rt=1:00:00 -wd ${OUTPUTDIR} ${OUTPUTDIR}/run_vep_to_lof_gene.sh
 
+	    VEPDEPENDACY=$(squeue -u aalasiri | cat | awk '{print $1}' | tail -n +2 | ${loftk}/transpose.pl | sed 's/\t/,/g')
+            echo "Job ID: ${VEPDEPENDACY}"
+	    sbatch --job-name=LoF_gene_${PROJECTNAME} --dependency=afterok:${VEPDEPENDACY} -e LoF_gene_${PROJECTNAME}.error -o LoF_gene_${PROJECTNAME}.log -t 01:00:00 -D ${OUTPUTDIR} ${OUTPUTDIR}/run_vep_to_lof_gene.sh
 #=====================#
 #### LoF variants #####
 #=====================#
-	    echo "sleep 15" > ${OUTPUTDIR}/run_vep_to_lof_snp.sh
+	    echo "#!/bin/bash" > ${OUTPUTDIR}/run_vep_to_lof_snp.sh
+	    echo "sleep 15" >> ${OUTPUTDIR}/run_vep_to_lof_snp.sh
             
 	    if [ ${FILE_FORMAT} == "IMPUTE2" ]; then
 		cp ${loftk}/vep_vcf_to_snp_lofs.pl ${OUTPUTDIR}
@@ -339,8 +341,10 @@ else
             fi
 
 	    echo "${PERL} ${loftk}/snp_lofs_to_snp_lof_counts.pl ${OUTPUTDIR}/${PROJECTNAME}_snp.lof ${OUTPUTDIR}/${PROJECTNAME}_snp.counts" >> ${OUTPUTDIR}/run_vep_to_lof_snp.sh
-	    qsub -S /bin/sh -N LoF_snp_${PROJECTNAME} -hold_jid VEP_${PROJECTNAME}_chr* -e LoF_snp_${PROJECTNAME}.error -o LoF_snp_${PROJECTNAME}.log -l h_rt=1:00:00 -wd ${OUTPUTDIR} ${OUTPUTDIR}/run_vep_to_lof_snp.sh
-    
+
+	    VEPDEPENDACY=$(squeue -u aalasiri | cat | awk '{print $1}' | tail -n +2 | ${loftk}/transpose.pl | sed 's/\t/,/g')
+            echo "Job ID: ${VEPDEPENDACY}"
+	    sbatch --job-name=LoF_snp_${PROJECTNAME} --dependency=afterok:${VEPDEPENDACY} -e LoF_snp_${PROJECTNAME}.error -o LoF_snp_${PROJECTNAME}.log -t 01:00:00 -D ${OUTPUTDIR} ${OUTPUTDIR}/run_vep_to_lof_snp.sh
 
     else
 	echoerrorflash "                        *** ERROR *** "
@@ -357,9 +361,9 @@ else
     gene_count="${OUTPUTDIR}/${PROJECTNAME}_gene.counts"
     snp_count="${OUTPUTDIR}/${PROJECTNAME}_snp.counts"
     while [[ ! -r "${gene_count}" ]] ; do
-	sleep 30 
+	importantnote "Collect genes containing LoF variants from vep.vcf files"
+	sleep 50 
     done
-    
     lof_gene="${OUTPUTDIR}/${PROJECTNAME}_gene.counts"
     lof_snp="${OUTPUTDIR}/${PROJECTNAME}_snp.counts"
     
@@ -372,6 +376,7 @@ else
     genehetmin=`cat ${lof_gene} | bash $loftk/transpose.sh | tail -n +5 | cut -d' ' -f 2- | sed 's/[^1]//g' | awk '{ print length }' | sort -g | head -1`
     genehetmax=`cat ${lof_gene} | bash $loftk/transpose.sh | tail -n +5 | cut -d' ' -f 2- | sed 's/[^1]//g' | awk '{ print length }' | sort -gr | head -1`
 
+
     echo "Cohort ${PROJECTNAME}" > ${OUTPUTDIR}/${PROJECTNAME}_output.info
     echo "" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
     echo "LoF genes contain LoF variants" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
@@ -381,7 +386,8 @@ else
 
     ## LoF variants
     while [[ ! -r "${snp_count}" ]] ; do
-        sleep 30
+        importantnote "Collect LoF variants from vep.vcf files"
+	sleep 50
     done
 
     onetwo=`cut -f 5- ${lof_snp} | tail -n +2 | awk '$0~/1/ || $0~/2/' | wc -l`
@@ -398,5 +404,6 @@ else
     echo "$genehetmin - $genehetmax heterozygous LoF variants per sample" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
     echo "$genehomomin - $genehomomax homozygous LoF variants per sample" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
     
+
 
 fi   # For [$# -lt 1]
