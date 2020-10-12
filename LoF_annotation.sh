@@ -104,15 +104,30 @@ else
     ### REQUIRED | GENERALS
     CONFIGURATIONFILE="$1" # Depends on arg1 -- but also on where it resides!!!
     
+    ### --- SLURM SETTINGS --- ###
+     ## LoF annotation (VEP, LOFTEE).
+    QUEUE_ANNOTATION=${QUEUE_ANNOTATION_CONFIG}
+    VMEM_ANNOTATION=${VMEM_ANNOTATION_CONFIG}
+    ## Calculation of LoF genes.
+    QUEUE_LOF_GENE=${QUEUE_LOF_GENE_CONFIG}
+    VMEM_LOF_GENE=${VMEM_LOF_GENE_CONFIG}
+    ## Calculation of LoF variants.
+    QUEUE_LOF_SNP=${QUEUE_LOF_SNP_CONFIG}
+    VMEM_LOF_SNP=${VMEM_LOF_SNP_CONFIG}
+
     ### MAIL SETTINGS
-    #EMAIL=${YOUREMAIL}
-    #MAILTYPE=${MAILSETTINGS}
+    EMAIL=${YOUREMAIL}
+    MAILTYPE=${MAILSETTINGS}
     
     ### PROJECT SPECIFIC 
     ROOTDIR=${ROOTDIR} # the root directory, e.g. /hpc/dhl_ec/aalasiri/projects/test_lof
     PROJECTNAME=${PROJECTNAME} # e.g. "ukb"
-    loftk=${LOFTOOLKIT}
-    
+    ENSEMBL=${ENSEMBL}
+    LOFTK=${LOFTOOLKIT}
+    USERNAME=$(whoami)
+    PROB2VCF="probs_to_vcf_${PROJECTNAME}"
+    VEP_ANNOTATION="VEP_${PROJECTNAME}_"
+
     ### Set up directory for VCF files
     if [ ! -d ${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF ]; then
         echo "The project directory doesn't exist; Mr. Bourne will make it for you."
@@ -141,7 +156,7 @@ else
             fi
 	    
 	    PROJECTDIR=${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF/vcf_chr"$chr"
-	    cp ${ROOTDIR}/*chr"$chr"*.vcf.gz ${PROJECTDIR}
+	    cp ${ROOTDIR}/*chr"$chr".b37*.vcf.gz ${PROJECTDIR} #@# need fix, will copy all chr1 anything after 1 such 10, 11, 12 .. 
 	    echo "${PROJECTNAME}"
 	    VCFDIR=${PROJECTDIR}
 	    echo "${VCFDIR}"
@@ -168,17 +183,23 @@ else
                     echo ${c%%.vcf.gz}_${count}.sh
 		    
 		    echo "#!/bin/bash" > ${c%%.vcf.gz}_${count}.sh
-		    echo "${VEP} --input_file $c --output_file ${c%.gz}.vep.vcf --vcf --offline --phased --assembly GRCh37 -plugin LoF,loftee_path:${LOFTEE},human_ancestor_fa:${HUMAN_ANCESTOR_FA},conservation_file:${CONSERVATION_FILE} --dir_plugins ${LOFTEE} --cache --dir_cache ${CACHEDIR} -port 3337 --force_overwrite" >> ${c%%.vcf.gz}_${count}.sh
+		    echo "${VEP} --input_file $c --output_file ${c%.gz}.vep.vcf --vcf --offline --phased --assembly GRCh37 --protein --canonical -plugin LoF,loftee_path:${LOFTEE},human_ancestor_fa:${HUMAN_ANCESTOR_FA},conservation_file:${CONSERVATION_FILE} --dir_plugins ${LOFTEE} --cache --dir_cache ${CACHEDIR} -port 3337 --force_overwrite" >> ${c%%.vcf.gz}_${count}.sh
 		    echo "gzip $c " >> ${c%.vcf.gz}_${count}.sh
 		    echo "gzip ${c%.gz}.vep.vcf " >> ${c%%.vcf.gz}_${count}.sh
 		    if [ ${FILE_FORMAT} == "IMPUTE2" ]; then #@# why ? YES I got it, because we have to wait for converting impute data to VCF
-			PROBDEPENDACY=$(squeue -u aalasiri | cat | awk '{print $1}' | tail -n +2 | ${loftk}/transpose.pl | sed 's/\t/,/g')
-		        echo ${PROBDEPENDACY}
+#			PROBDEPENDACY=$(squeue -u ${USERNAME} | cat | awk '{print $1}' | tail -n +2 | ${LOFTK}/transpose.pl | sed 's/\t/,/g')
+#			PROB2VCF=probs_to_vcf_${PROJECTNAME}
+#			PROBDEPENDACY=$(sacct --format="JobID,JobName%30,State" | awk -v prob=${PROB2VCF} '$2 ~ prob {print $0}' | awk '$3 == "RUNNING" || $3 == "PENDING" {print $1}' | ${LOFTK}/transpose.pl | sed 's/\t/,/g')
 
-			sbatch --job-name=VEP_${PROJECTNAME}_chr"$chr"_$count --dependency=afterok:${PROBDEPENDACY} -e VEP_${PROJECTNAME}_chr"$chr"_$count.error -o VEP_${PROJECTNAME}_chr"$chr"_$count.log -t 01:00:00 -D ${VCFDIR} ${c%%.vcf.gz}_${count}.sh
+			
+#		        echo ${PROBDEPENDACY}
+
+#			sbatch --job-name=VEP_${PROJECTNAME}_chr"$chr"_$count --dependency=afterok:${PROBDEPENDACY} -e VEP_${PROJECTNAME}_chr"$chr"_$count.error -o VEP_${PROJECTNAME}_chr"$chr"_$count.log -t 01:00:00 -D ${VCFDIR} ${c%%.vcf.gz}_${count}.sh
+			sbatch --job-name=VEP_${PROJECTNAME}_chr"$chr"_$count -e VEP_${PROJECTNAME}_chr"$chr"_$count.error -o VEP_${PROJECTNAME}_chr"$chr"_$count.log -t ${QUEUE_ANNOTATION} --mem=${VMEM_ANNOTATION} --mail-user=${EMAIL} --mail-type=${MAILTYPE} -D ${VCFDIR} ${c%%.vcf.gz}_${count}.sh
+
 			
 		    elif [ ${FILE_FORMAT} == "VCF" ]; then 
-			sbatch --job-name=VEP_${PROJECTNAME}_chr"$chr"_$count -e VEP_${PROJECTNAME}_chr"$chr"_$count.error -o VEP_${PROJECTNAME}_chr"$chr"_$count.log -t 01:00:00 -D ${VCFDIR} ${c%%.vcf.gz}_${count}.sh
+			sbatch --job-name=VEP_${PROJECTNAME}_chr"$chr"_$count -e VEP_${PROJECTNAME}_chr"$chr"_$count.error -o VEP_${PROJECTNAME}_chr"$chr"_$count.log -t ${QUEUE_ANNOTATION} --mem=${VMEM_ANNOTATION} --mail-user=${EMAIL} --mail-type=${MAILTYPE} -D ${VCFDIR} ${c%%.vcf.gz}_${count}.sh
 
 		    else
 			echoerrorflash "                        *** ERROR *** "
@@ -205,11 +226,11 @@ else
                     echo ${c%.vcf.gz}_${count}.sh
 
 		    echo "#!/bin/bash" > ${c%%.vcf.gz}_${count}.sh
-                    echo "${VEP} --input_file $c --output_file ${c%.gz}.vep.vcf --vcf --offline --phased --assembly GRCh38 -plugin LoF,loftee_path:${LOFTEE},human_ancestor_fa:${HUMAN_ANCESTOR_FA},conservation_file:${CONSERVATION_FILE},gerp_bigwig:${GERP_BIGWIG} --dir_plugins ${LOFTEE} --cache --dir_cache ${CACHEDIR} --force_overwrite" >> ${c%.vcf.gz}_${count}.sh
+                    echo "${VEP} --input_file $c --output_file stdout --vcf --offline --phased --assembly GRCh38 --protein --canonical -plugin LoF,loftee_path:${LOFTEE},human_ancestor_fa:${HUMAN_ANCESTOR_FA},conservation_file:${CONSERVATION_FILE},gerp_bigwig:${GERP_BIGWIG} --dir_plugins ${LOFTEE} --cache --dir_cache ${CACHEDIR} | ${ENSEMBL}/filter_vep  -o ${c%.gz}.vep.vcf --filter "LoF is HC" --only_matched --force_overwrite" >> ${c%.vcf.gz}_${count}.sh
 		    echo "gzip $c " >> ${c%.vcf.gz}_${count}.sh
                     echo "gzip ${c%.gz}.vep.vcf " >> ${c%.vcf.gz}_${count}.sh
 
-		    sbatch --job-name=VEP_${PROJECTNAME}_chr"$chr"_$count -e VEP_${PROJECTNAME}_chr"$chr"_$count.error -o VEP_${PROJECTNAME}_chr"$chr"_$count.log -t 01:00:00 -D ${VCFDIR} ${c%%.vcf.gz}_${count}.sh
+		    sbatch --job-name=VEP_${PROJECTNAME}_chr"$chr"_$count -e VEP_${PROJECTNAME}_chr"$chr"_$count.error -o VEP_${PROJECTNAME}_chr"$chr"_$count.log -t ${QUEUE_ANNOTATION} --mem=${VMEM_ANNOTATION} --mail-user=${EMAIL} --mail-type=${MAILTYPE} -D ${VCFDIR} ${c%%.vcf.gz}_${count}.sh
 
                     sleep 5
                     ((count++))
@@ -245,11 +266,11 @@ else
 	    echo "mv ${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF/vcf_chr*/*vep.vcf.gz ${OUTPUTDIR}" >> ${OUTPUTDIR}/run_vep_to_lof_gene.sh
 
 	    if [ ${FILE_FORMAT} == "IMPUTE2" ]; then
-		cp ${loftk}/vep_vcf_to_gene_lofs.pl ${OUTPUTDIR}
+		cp ${LOFTK}/vep_vcf_to_gene_lofs.pl ${OUTPUTDIR}
 		echo "sleep 15" >> ${OUTPUTDIR}/run_vep_to_lof_gene.sh
 		echo "${PERL} vep_vcf_to_gene_lofs.pl -v -o ${PROJECTNAME}_gene.lof" >> ${OUTPUTDIR}/run_vep_to_lof_gene.sh
 	    elif [ ${FILE_FORMAT} == "VCF" ]; then 
-		cp ${loftk}/vep_vcf_to_gene_lofs_vcf.pl ${OUTPUTDIR}
+		cp ${LOFTK}/vep_vcf_to_gene_lofs_vcf.pl ${OUTPUTDIR}
 		echo "sleep 15" >> ${OUTPUTDIR}/run_vep_to_lof_gene.sh
 		echo "${PERL} vep_vcf_to_gene_lofs_vcf.pl -v -o ${PROJECTNAME}_gene.lof" >> ${OUTPUTDIR}/run_vep_to_lof_gene.sh
 	    else
@@ -259,12 +280,13 @@ else
                 exit 1
             fi
 
-	    echo "${PERL} ${loftk}/gene_lofs_to_gene_lof_counts.pl ${OUTPUTDIR}/${PROJECTNAME}_gene.lof ${OUTPUTDIR}/${PROJECTNAME}_gene.counts" >> ${OUTPUTDIR}/run_vep_to_lof_gene.sh
-	    echo "${PERL} ${loftk}/gene_lofs_to_lof_snps.pl ${OUTPUTDIR}/${PROJECTNAME}_gene.lof ${OUTPUTDIR}/${PROJECTNAME}_gene.lof.snps" >> ${OUTPUTDIR}/run_vep_to_lof_gene.sh
+	    echo "${PERL} ${LOFTK}/gene_lofs_to_gene_lof_counts.pl ${OUTPUTDIR}/${PROJECTNAME}_gene.lof ${OUTPUTDIR}/${PROJECTNAME}_gene.counts" >> ${OUTPUTDIR}/run_vep_to_lof_gene.sh
+	    echo "${PERL} ${LOFTK}/gene_lofs_to_lof_snps.pl ${OUTPUTDIR}/${PROJECTNAME}_gene.lof ${OUTPUTDIR}/${PROJECTNAME}_gene.lof.snps" >> ${OUTPUTDIR}/run_vep_to_lof_gene.sh
 
-	    VEPDEPENDACY=$(squeue -u aalasiri | cat | awk '{print $1}' | tail -n +2 | ${loftk}/transpose.pl | sed 's/\t/,/g')
+#@#	    VEPDEPENDACY=$(squeue -u ${USERNAME} | cat | awk '{print $1}' | tail -n +2 | ${LOFTK}/transpose.pl | sed 's/\t/,/g')
+	    VEPDEPENDACY=$(sacct --format="JobID,JobName%30,State" | awk -v vepann=${VEP_ANNOTATION} '$2 ~ vepann {print $0}' | awk '$3 == "RUNNING" || $3 == "PENDING" {print $1}' | ${LOFTK}/transpose.pl | sed 's/\t/,/g')
             echo "Job ID: ${VEPDEPENDACY}"
-	    sbatch --job-name=LoF_gene_${PROJECTNAME} --dependency=afterok:${VEPDEPENDACY} -e LoF_gene_${PROJECTNAME}.error -o LoF_gene_${PROJECTNAME}.log -t 01:00:00 -D ${OUTPUTDIR} ${OUTPUTDIR}/run_vep_to_lof_gene.sh
+	    sbatch --job-name=LoF_gene_${PROJECTNAME} --dependency=afterok:${VEPDEPENDACY} -e LoF_gene_${PROJECTNAME}.error -o LoF_gene_${PROJECTNAME}.log -t ${QUEUE_LOF_GENE} --mem=${VMEM_LOF_GENE} --mail-user=${EMAIL} --mail-type=${MAILTYPE} -D ${OUTPUTDIR} ${OUTPUTDIR}/run_vep_to_lof_gene.sh
 
 
 #=====================#
@@ -273,10 +295,10 @@ else
 	    echo "#!/bin/bash" > ${OUTPUTDIR}/run_vep_to_lof_snp.sh
 	    echo "sleep 15" >> ${OUTPUTDIR}/run_vep_to_lof_snp.sh
 	    if [ ${FILE_FORMAT} == "IMPUTE2" ]; then
-		cp ${loftk}/vep_vcf_to_snp_lofs.pl ${OUTPUTDIR}
+		cp ${LOFTK}/vep_vcf_to_snp_lofs.pl ${OUTPUTDIR}
 		echo "${PERL} vep_vcf_to_snp_lofs.pl -v -o ${PROJECTNAME}_snp.lof" >> ${OUTPUTDIR}/run_vep_to_lof_snp.sh
 	    elif [ ${FILE_FORMAT} == "VCF" ]; then
-                cp ${loftk}/vep_vcf_to_snp_lofs_vcf.pl ${OUTPUTDIR}
+                cp ${LOFTK}/vep_vcf_to_snp_lofs_vcf.pl ${OUTPUTDIR}
 		echo "${PERL} vep_vcf_to_snp_lofs_vcf.pl -v -o ${PROJECTNAME}_snp.lof" >> ${OUTPUTDIR}/run_vep_to_lof_snp.sh
             else
                 echoerrorflash "                        *** ERROR *** "
@@ -285,11 +307,12 @@ else
                 exit 1
             fi
 	    
-	    echo "${PERL} ${loftk}/snp_lofs_to_snp_lof_counts.pl ${OUTPUTDIR}/${PROJECTNAME}_snp.lof ${OUTPUTDIR}/${PROJECTNAME}_snp.counts" >> ${OUTPUTDIR}/run_vep_to_lof_snp.sh
+	    echo "${PERL} ${LOFTK}/snp_lofs_to_snp_lof_counts.pl ${OUTPUTDIR}/${PROJECTNAME}_snp.lof ${OUTPUTDIR}/${PROJECTNAME}_snp.counts" >> ${OUTPUTDIR}/run_vep_to_lof_snp.sh
 	    
-	    VEPDEPENDACY=$(squeue -u aalasiri | cat | awk '{print $1}' | tail -n +2 | ${loftk}/transpose.pl | sed 's/\t/,/g')
-            echo "Job ID: ${VEPDEPENDACY}"
-	    sbatch --job-name=LoF_snp_${PROJECTNAME} --dependency=afterok:${VEPDEPENDACY} -e LoF_snp_${PROJECTNAME}.error -o LoF_snp_${PROJECTNAME}.log -t 01:00:00 -D ${OUTPUTDIR} ${OUTPUTDIR}/run_vep_to_lof_snp.sh
+#@#	    VEPDEPENDACY=$(squeue -u ${USERNAME} | cat | awk '{print $1}' | tail -n +2 | ${LOFTK}/transpose.pl | sed 's/\t/,/g')
+            VEPDEPENDACY=$(sacct --format="JobID,JobName%30,State" | awk -v vepann=${VEP_ANNOTATION} '$2 ~ vepann {print $0}' | awk '$3 == "RUNNING" || $3 == "PENDING" {print $1}' | ${LOFTK}/transpose.pl | sed 's/\t/,/g')
+	    echo "Job ID: ${VEPDEPENDACY}"
+	    sbatch --job-name=LoF_snp_${PROJECTNAME} --dependency=afterok:${VEPDEPENDACY} -e LoF_snp_${PROJECTNAME}.error -o LoF_snp_${PROJECTNAME}.log -t ${QUEUE_LOF_SNP} --mem=${VMEM_LOF_SNP} --mail-user=${EMAIL} --mail-type=${MAILTYPE} -D ${OUTPUTDIR} ${OUTPUTDIR}/run_vep_to_lof_snp.sh
 
     elif [ ${ASSEMBLY} == "GRCh38" ]; then
             echo "Genes list with high-confidence loss-of-function mutations."
@@ -302,11 +325,11 @@ else
 	    echo "sleep 15" >> ${OUTPUTDIR}/run_vep_to_lof_gene.sh
 
 	    if [ ${FILE_FORMAT} == "IMPUTE2" ]; then
-		cp ${loftk}/vep_vcf_to_gene_lofs.pl ${OUTPUTDIR}
+		cp ${LOFTK}/vep_vcf_to_gene_lofs.pl ${OUTPUTDIR}
 
                 echo "${PERL} vep_vcf_to_gene_lofs.pl -v -o ${PROJECTNAME}_gene.lof" >> ${OUTPUTDIR}/run_vep_to_lof_gene.sh
             elif [ ${FILE_FORMAT} == "VCF" ]; then
-		cp ${loftk}/vep_vcf_to_gene_lofs_vcf.pl ${OUTPUTDIR}
+		cp ${LOFTK}/vep_vcf_to_gene_lofs_vcf.pl ${OUTPUTDIR}
                 echo "${PERL} vep_vcf_to_gene_lofs_vcf.pl -v -o ${PROJECTNAME}_gene.lof" >> ${OUTPUTDIR}/run_vep_to_lof_gene.sh
             else
                 echoerrorflash "                        *** ERROR *** "
@@ -315,12 +338,13 @@ else
                 exit 1
             fi
 
-            echo "${PERL} ${loftk}/gene_lofs_to_gene_lof_counts.pl ${OUTPUTDIR}/${PROJECTNAME}_gene.lof ${OUTPUTDIR}/${PROJECTNAME}_gene.counts" >> ${OUTPUTDIR}/run_vep_to_lof_gene.sh
-            echo "${PERL} ${loftk}/gene_lofs_to_lof_snps.pl ${OUTPUTDIR}/${PROJECTNAME}_gene.lof ${OUTPUTDIR}/${PROJECTNAME}_gene.lof.snps" >> ${OUTPUTDIR}/run_vep_to_lof_gene.sh
+            echo "${PERL} ${LOFTK}/gene_lofs_to_gene_lof_counts.pl ${OUTPUTDIR}/${PROJECTNAME}_gene.lof ${OUTPUTDIR}/${PROJECTNAME}_gene.counts" >> ${OUTPUTDIR}/run_vep_to_lof_gene.sh
+            echo "${PERL} ${LOFTK}/gene_lofs_to_lof_snps.pl ${OUTPUTDIR}/${PROJECTNAME}_gene.lof ${OUTPUTDIR}/${PROJECTNAME}_gene.lof.snps" >> ${OUTPUTDIR}/run_vep_to_lof_gene.sh
 
-	    VEPDEPENDACY=$(squeue -u aalasiri | cat | awk '{print $1}' | tail -n +2 | ${loftk}/transpose.pl | sed 's/\t/,/g')
+#@#	    VEPDEPENDACY=$(squeue -u ${USERNAME} | cat | awk '{print $1}' | tail -n +2 | ${LOFTK}/transpose.pl | sed 's/\t/,/g')
+	    VEPDEPENDACY=$(sacct --format="JobID,JobName%30,State" | awk -v vepann=${VEP_ANNOTATION} '$2 ~ vepann {print $0}' | awk '$3 == "RUNNING" || $3 == "PENDING" {print $1}' | ${LOFTK}/transpose.pl | sed 's/\t/,/g')
             echo "Job ID: ${VEPDEPENDACY}"
-	    sbatch --job-name=LoF_gene_${PROJECTNAME} --dependency=afterok:${VEPDEPENDACY} -e LoF_gene_${PROJECTNAME}.error -o LoF_gene_${PROJECTNAME}.log -t 01:00:00 -D ${OUTPUTDIR} ${OUTPUTDIR}/run_vep_to_lof_gene.sh
+	    sbatch --job-name=LoF_gene_${PROJECTNAME} --dependency=afterok:${VEPDEPENDACY} -e LoF_gene_${PROJECTNAME}.error -o LoF_gene_${PROJECTNAME}.log -t ${QUEUE_LOF_GENE} --mem=${VMEM_LOF_GENE} --mail-user=${EMAIL} --mail-type=${MAILTYPE} -D ${OUTPUTDIR} ${OUTPUTDIR}/run_vep_to_lof_gene.sh
 #=====================#
 #### LoF variants #####
 #=====================#
@@ -328,10 +352,10 @@ else
 	    echo "sleep 15" >> ${OUTPUTDIR}/run_vep_to_lof_snp.sh
             
 	    if [ ${FILE_FORMAT} == "IMPUTE2" ]; then
-		cp ${loftk}/vep_vcf_to_snp_lofs.pl ${OUTPUTDIR}
+		cp ${LOFTK}/vep_vcf_to_snp_lofs.pl ${OUTPUTDIR}
                 echo "${PERL} vep_vcf_to_snp_lofs.pl -v -o ${PROJECTNAME}_snp.lof" >> ${OUTPUTDIR}/run_vep_to_lof_snp.sh
             elif [ ${FILE_FORMAT} == "VCF" ]; then
-		cp ${loftk}/vep_vcf_to_snp_lofs_vcf.pl ${OUTPUTDIR}
+		cp ${LOFTK}/vep_vcf_to_snp_lofs_vcf.pl ${OUTPUTDIR}
                 echo "${PERL} vep_vcf_to_snp_lofs_vcf.pl -v -o ${PROJECTNAME}_snp.lof" >> ${OUTPUTDIR}/run_vep_to_lof_snp.sh
             else
                 echoerrorflash "                        *** ERROR *** "
@@ -340,11 +364,12 @@ else
                 exit 1
             fi
 
-	    echo "${PERL} ${loftk}/snp_lofs_to_snp_lof_counts.pl ${OUTPUTDIR}/${PROJECTNAME}_snp.lof ${OUTPUTDIR}/${PROJECTNAME}_snp.counts" >> ${OUTPUTDIR}/run_vep_to_lof_snp.sh
+	    echo "${PERL} ${LOFTK}/snp_lofs_to_snp_lof_counts.pl ${OUTPUTDIR}/${PROJECTNAME}_snp.lof ${OUTPUTDIR}/${PROJECTNAME}_snp.counts" >> ${OUTPUTDIR}/run_vep_to_lof_snp.sh
 
-	    VEPDEPENDACY=$(squeue -u aalasiri | cat | awk '{print $1}' | tail -n +2 | ${loftk}/transpose.pl | sed 's/\t/,/g')
+#@#	    VEPDEPENDACY=$(squeue -u ${USERNAME} | cat | awk '{print $1}' | tail -n +2 | ${LOFTK}/transpose.pl | sed 's/\t/,/g')
+	    VEPDEPENDACY=$(sacct --format="JobID,JobName%30,State" | awk -v vepann=${VEP_ANNOTATION} '$2 ~ vepann {print $0}' | awk '$3 == "RUNNING" || $3 == "PENDING" {print $1}' | ${LOFTK}/transpose.pl | sed 's/\t/,/g')
             echo "Job ID: ${VEPDEPENDACY}"
-	    sbatch --job-name=LoF_snp_${PROJECTNAME} --dependency=afterok:${VEPDEPENDACY} -e LoF_snp_${PROJECTNAME}.error -o LoF_snp_${PROJECTNAME}.log -t 01:00:00 -D ${OUTPUTDIR} ${OUTPUTDIR}/run_vep_to_lof_snp.sh
+	    sbatch --job-name=LoF_snp_${PROJECTNAME} --dependency=afterok:${VEPDEPENDACY} -e LoF_snp_${PROJECTNAME}.error -o LoF_snp_${PROJECTNAME}.log -t ${QUEUE_LOF_SNP} --mem=${VMEM_LOF_SNP} --mail-user=${EMAIL} --mail-type=${MAILTYPE} -D ${OUTPUTDIR} ${OUTPUTDIR}/run_vep_to_lof_snp.sh
 
     else
 	echoerrorflash "                        *** ERROR *** "
@@ -366,16 +391,16 @@ else
     done
     lof_gene="${OUTPUTDIR}/${PROJECTNAME}_gene.counts"
     lof_snp="${OUTPUTDIR}/${PROJECTNAME}_snp.counts"
-    
+    SAMPLE_SIZE=$(head -1 ${lof_gene}  | cut -f5- | wc -w)
     ##
     onetwo=`cut -f 5- ${lof_gene} | tail -n +2 | awk '$0~/1/ || $0~/2/' | wc -l`
     one=`cut -f 5- ${lof_gene} | tail -n +2 | awk '$0~/1/' | wc -l `
     two=`cut -f 5- ${lof_gene} | tail -n +2 | awk '$0~/2/' | wc -l `
-    genehomomin=`cat ${lof_gene} | bash $loftk/transpose.sh | tail -n +5 | cut -d' ' -f 2- | sed 's/[^2]//g' | awk '{ print length }' | sort -g | head -1`
-    genehomomax=`cat ${lof_gene} | bash $loftk/transpose.sh | tail -n +5 | cut -d' ' -f 2- | sed 's/[^2]//g' | awk '{ print length }' | sort -gr | head -1`
-    genehetmin=`cat ${lof_gene} | bash $loftk/transpose.sh | tail -n +5 | cut -d' ' -f 2- | sed 's/[^1]//g' | awk '{ print length }' | sort -g | head -1`
-    genehetmax=`cat ${lof_gene} | bash $loftk/transpose.sh | tail -n +5 | cut -d' ' -f 2- | sed 's/[^1]//g' | awk '{ print length }' | sort -gr | head -1`
-
+    genehomomin=`cat ${lof_gene} | bash $LOFTK/transpose.sh | tail -n +5 | cut -d' ' -f 2- | sed 's/[^2]//g' | awk '{ print length }' | sort -g | head -1`
+    genehomomax=`cat ${lof_gene} | bash $LOFTK/transpose.sh | tail -n +5 | cut -d' ' -f 2- | sed 's/[^2]//g' | awk '{ print length }' | sort -gr | head -1`
+    genehetmin=`cat ${lof_gene} | bash $LOFTK/transpose.sh | tail -n +5 | cut -d' ' -f 2- | sed 's/[^1]//g' | awk '{ print length }' | sort -g | head -1`
+    genehetmax=`cat ${lof_gene} | bash $LOFTK/transpose.sh | tail -n +5 | cut -d' ' -f 2- | sed 's/[^1]//g' | awk '{ print length }' | sort -gr | head -1`
+    median=`cat ${lof_gene} | bash $LOFTK/transpose.sh | tail -n +5 | cut -d' ' -f 2- | sed 's/[^12]//g' | awk '{print length }' | sort -g | awk '{count[NR] = $1;} END {if (NR % 2) {print count[(NR + 1) / 2];} else {print (count[(NR / 2)] + count[(NR / 2) + 1]) / 2.0;}}'`
 
     echo "Cohort ${PROJECTNAME}" > ${OUTPUTDIR}/${PROJECTNAME}_output.info
     echo "" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
@@ -383,6 +408,7 @@ else
     echo "$one genes contain heterozygous LoF, $two genes contain homozygous LoF, $onetwo as a total of genes contain LoF variant" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
     echo "$genehetmin - $genehetmax genes with heterozygous LoF variants per sample" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
     echo "$genehomomin - $genehomomax genes with homozygous LoF variants per sample" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
+    echo "Median of LoF genes per sample is ${median}" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
 
     ## LoF variants
     while [[ ! -r "${snp_count}" ]] ; do
@@ -393,17 +419,18 @@ else
     onetwo=`cut -f 5- ${lof_snp} | tail -n +2 | awk '$0~/1/ || $0~/2/' | wc -l`
     one=`cut -f 5- ${lof_snp} | tail -n +2 | awk '$0~/1/' | wc -l `
     two=`cut -f 5- ${lof_snp} | tail -n +2 | awk '$0~/2/' | wc -l `
-    genehomomin=`cat ${lof_snp} | bash $loftk/transpose.sh | tail -n +5 | cut -d' ' -f 2- | sed 's/[^2]//g' | awk '{ print length }' | sort -g | head -1`
-    genehomomax=`cat ${lof_snp} | bash $loftk/transpose.sh | tail -n +5 | cut -d' ' -f 2- | sed 's/[^2]//g' | awk '{ print length }' | sort -gr | head -1`
-    genehetmin=`cat ${lof_snp} | bash $loftk/transpose.sh | tail -n +5 | cut -d' ' -f 2- | sed 's/[^1]//g' | awk '{ print length }' | sort -g | head -1`
-    genehetmax=`cat ${lof_snp} | bash $loftk/transpose.sh | tail -n +5 | cut -d' ' -f 2- | sed 's/[^1]//g' | awk '{ print length }' | sort -gr | head -1`
+    genehomomin=`cat ${lof_snp} | bash $LOFTK/transpose.sh | tail -n +7 | cut -d' ' -f 2- | sed 's/[^2]//g' | awk '{ print length }' | sort -g | head -1`
+    genehomomax=`cat ${lof_snp} | bash $LOFTK/transpose.sh | tail -n +7 | cut -d' ' -f 2- | sed 's/[^2]//g' | awk '{ print length }' | sort -gr | head -1`
+    genehetmin=`cat ${lof_snp} | bash $LOFTK/transpose.sh | tail -n +7 | cut -d' ' -f 2- | sed 's/[^1]//g' | awk '{ print length }' | sort -g | head -1`
+    genehetmax=`cat ${lof_snp} | bash $LOFTK/transpose.sh | tail -n +7 | cut -d' ' -f 2- | sed 's/[^1]//g' | awk '{ print length }' | sort -gr | head -1`
+    median=`cat ${lof_snp} | bash $LOFTK/transpose.sh | tail -n +5 | cut -d' ' -f 2- | sed 's/[^12]//g' | awk '{print length }' | sort -g | awk '{count[NR] = $1;} END {if (NR % 2) {print count[(NR + 1) / 2];} else {print (count[(NR / 2)] + count[(NR / 2) + 1]) / 2.0;}}'`
 
     echo "" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
     echo "LoF variants" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
     echo "$one heterozygous LoF, $two homozygous LoF, $onetwo total of LoF variant" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
     echo "$genehetmin - $genehetmax heterozygous LoF variants per sample" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
     echo "$genehomomin - $genehomomax homozygous LoF variants per sample" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
-    
+    echo "Median of LoF genes per sample is ${median}" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
 
 
 fi   # For [$# -lt 1]

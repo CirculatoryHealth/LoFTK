@@ -138,7 +138,8 @@ sub parse_genotype {
   #Given a VCF genotype entry, returns a reference to a 2-element array containing just the genotype values: 0, 1, or '.' (for missing).
   my $genotype_string = shift;
   $genotype_string =~ s/:.*$//; #Strip away anything that isn't the genotype part.
-  my @parsed_genotype = split /\|/ , $genotype_string; #Phased genotypes.
+#  my @parsed_genotype = split /\|/ , $genotype_string; #Phased genotypes.
+  my @parsed_genotype = split /[\|\/]/ , $genotype_string; #Phased genotypes.
   return \@parsed_genotype;
 }
 

@@ -85,7 +85,7 @@ else
     PROJECTNAME=${PROJECTNAME} # e.g. "ukb_5K"
     loftk=${LOFTOOLKIT}
 
-    if [[ ${DATA_TYPE} == "genotype" ]] && [[ ${FILE_FORMAT} == "IMPUTE2" ]]; then #@# DONE
+    if [[ ${DATA_TYPE} == "genotype" ]] && [[ ${FILE_FORMAT} == "IMPUTE2" ]]; then 
 	echo "LoFTK will analyze the ${DATA_TYPE} data that exist in ${FILE_FORMAT} files." 
 	${loftk}/allele_to_vcf.sh ${CONFIGURATIONFILE}
 	${loftk}/LoF_annotation.sh ${CONFIGURATIONFILE}
