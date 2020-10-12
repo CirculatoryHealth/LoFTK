@@ -430,7 +430,7 @@ else
     echo "$one heterozygous LoF, $two homozygous LoF, $onetwo total of LoF variant" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
     echo "$genehetmin - $genehetmax heterozygous LoF variants per sample" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
     echo "$genehomomin - $genehomomax homozygous LoF variants per sample" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
-    echo "Median of LoF genes per sample is ${median}" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
+    echo "Median of LoF variants per sample is ${median}" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
 
 
 fi   # For [$# -lt 1]
