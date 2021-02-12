@@ -10,13 +10,13 @@ All scripts are annotated for debugging purposes - and future reference. The scr
 ## This version submit all jobs to the SLURM cluster.
 
 #### Requirements
-VEP
-Perl >= 5.10.1
-Bash
-LOFTEE
-Ancestral sequence (human_ancestor.fa[.gz|.rz])
-Samtools (must be on path)
-PhyloCSF database (phylocsf.sql) for conservation filters
+- VEP
+- Perl >= 5.10.1
+- Bash
+- LOFTEE
+- Ancestral sequence (human_ancestor.fa[.gz|.rz])
+- Samtools (must be on path)
+- PhyloCSF database (phylocsf.sql) for conservation filters
 
 #### Usage
 The only script the user should use is the run_loftk.sh script in conjunction with a configuration file LoF.config.
