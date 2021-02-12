@@ -3,7 +3,7 @@ LOFTK (Loss-of-Function ToolKit)
 
 **LoFToolKit** is a pipeline written in the BASH and Perl languages to identify loss-of function (LoF) variants using VEP and LOFTEE efficiently. It will aid in annotating LoF variants, select high confidence (HC) variants, state the homozygous and heterozygous LoF variants, and calculate statistics. 
 
-All scripts are annotated for debugging purposes - and future reference. The scripts will work within the context of a certain Linux environment (in this case a CentOS7 system on a SUN Grid Engine background). As such we have tested LOFToolKit on CentOS7.
+All scripts are annotated for debugging purposes - and future reference. The scripts will work within the context of a certain Linux environment (in this case a CentOS7 system on a SLURM Grid Engine background). As such we have tested LOFToolKit on CentOS7.
 
 --------------
 
