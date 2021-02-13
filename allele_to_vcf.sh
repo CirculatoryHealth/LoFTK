@@ -76,19 +76,23 @@ else
     
     ### REQUIRED | GENERALS
     CONFIGURATIONFILE="$1" # Depends on arg1 -- but also on where it resides!!!
-    
+
+    ### --- SLURM SETTINGS --- ###
+    QUEUE_PROB2VCF=${QUEUE_PROB2VCF_CONFIG}
+    VMEM_PROB2VCF=${VMEM_PROB2VCF_CONFIG}
     ### MAIL SETTINGS
-    #EMAIL=${YOUREMAIL}
-    #MAILTYPE=${MAILSETTINGS}
-    
+    EMAIL=${YOUREMAIL}
+    MAILTYPE=${MAILSETTINGS}
     ### PROJECT SPECIFIC 
     ROOTDIR=${ROOTDIR} # the root directory, e.g. /hpc/dhl_ec/aalasiri/projects/test_lof
     PROJECTNAME=${PROJECTNAME} # e.g. "ukb"
-    loftk=${LOFTOOLKIT}
+    LOFTK=${LOFTOOLKIT}
 
     ### PROJECT SPECIFIC 
     ROOTDIR=${ROOTDIR} # the root directory, e.g. /hpc/dhl_ec/svanderlaan/projects/test_lof
     PROJECTNAME=${PROJECTNAME} # e.g. "WES_ukb_5K"
+    INFO=${INFO}
+    PROB=${PROB}
     haps=`ls -1 ${ROOTDIR}/*haps.gz 2>/dev/null | wc -l`
     allele_probs=`ls -1 ${ROOTDIR}/*allele_probs.gz 2>/dev/null | wc -l`
     info=`ls -1 ${ROOTDIR}/*info 2>/dev/null | wc -l`
@@ -101,7 +105,7 @@ else
     script_arguments_error "When running a *** LoF analysis *** using IMPUTE2 files, you must supply 'haps.gz', 'allele_probs.gz', 'info' and 'sample' as INPUT_FILE_FORMAT!"
 
     elif [ ! -d ${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF ]; then
-	echo "The project directory doesn't exist; Mr. Bourne will make it for you."
+	echoerrorflash "The project directory doesn't exist; Mr. Bourne will make it for you."
 	mkdir -v ${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF
     else
 	echo "The project directory '${ROOTDIR}/${PROJECTNAME}' already exists."
@@ -116,10 +120,10 @@ else
     do
         echo "chr "$chr""
 	if [ ! -d ${PROJECTDIR}/vcf_chr"$chr" ]; then
-	    echo "The ${PROJECTDIR}/vcf_chr"$chr" directory doesn't exist; Mr. Bourne will make it for you."
+	    echoerrorflash "The ${PROJECTDIR}/vcf_chr"$chr" directory doesn't exist; Mr. Bourne will make it for you."
 	    mkdir -v ${PROJECTDIR}/vcf_chr"$chr"
 	elif [ "$(ls -A ${PROJECTDIR}/vcf_chr"$chr")" ]; then
-	    echo "The ${PROJECTDIR}/vcf_chr"$chr" directory already exists; Mr. Bourne will make it empity for you."
+	    echoerrorflash "The ${PROJECTDIR}/vcf_chr"$chr" directory already exists; Mr. Bourne will make it empity for you."
 	    rm ${PROJECTDIR}/vcf_chr"$chr"/*
 	else 
 	    echo "The ${PROJECTDIR}/vcf_chr"$chr" directory already exists and empity."
@@ -128,8 +132,8 @@ else
 	cp ${ROOTDIR}/*_GoNL_1KG_chr"$chr"\:*sample* ${PROJECTDIR}/vcf_chr"$chr"
 
 ### The full Mb span of the chromosome
-        start=$( awk ' $1=="'$chr'" { print $2 } ' $loftk/chromosome_windows.txt )
-        stop=$( awk ' $1=="'$chr'" { print $3 } ' $loftk/chromosome_windows.txt )
+        start=$( awk ' $1=="'$chr'" { print $2 } ' $LOFTK/chromosome_windows.txt )
+        stop=$( awk ' $1=="'$chr'" { print $3 } ' $LOFTK/chromosome_windows.txt )
         while [ $start -le $stop ]
         do
 
@@ -154,17 +158,17 @@ else
 ### This does not work with csh, manually!
         find ${PROJECTDIR}/vcf_chr*/ -name "*_GoNL_1KG_chr*Mb_allele_probs.gz" -size -70c -delete
 
-#=========================================#
-#### Preparation of imputation files  #####
-#=========================================#
+#=====================================================#
+#### Convert imputation probs files to VCF files  #####
+#=====================================================#
 ### Run allele_probs_to_vcf in all folders
-        cp ${loftk}/allele_probs_to_vcfs.pl ${PROJECTDIR}/vcf_chr"$chr"/
+        cp ${LOFTK}/allele_probs_to_vcfs.pl ${PROJECTDIR}/vcf_chr"$chr"/
 	echo "#!/bin/bash" > ${PROJECTDIR}/vcf_chr"$chr"/run_allele_probs_to_vcf_${PROJECTNAME}_chr"$chr".sh
 
-        echo "perl allele_probs_to_vcfs.pl -v" >> ${PROJECTDIR}/vcf_chr"$chr"/run_allele_probs_to_vcf_${PROJECTNAME}_chr"$chr".sh
+        echo "perl allele_probs_to_vcfs.pl -i ${INFO} -p ${PROB} -v" >> ${PROJECTDIR}/vcf_chr"$chr"/run_allele_probs_to_vcf_${PROJECTNAME}_chr"$chr".sh
         echo "gzip *.vcf" >> ${PROJECTDIR}/vcf_chr"$chr"/run_allele_probs_to_vcf_${PROJECTNAME}_chr"$chr".sh
 
-	sbatch --job-name=allele_probs_to_vcf_${PROJECTNAME}_chr"$chr" -e allele_probs_to_vcf_${PROJECTNAME}_chr"$chr".errors -o allele_probs_to_vcf_${PROJECTNAME}_chr"$chr".log -t 02:00:00 -D ${PROJECTDIR}/vcf_chr"$chr" ${PROJECTDIR}/vcf_chr"$chr"/run_allele_probs_to_vcf_${PROJECTNAME}_chr"$chr".sh
+	sbatch --job-name=probs_to_vcf_${PROJECTNAME}_chr"$chr" -e allele_probs_to_vcf_${PROJECTNAME}_chr"$chr".errors -o allele_probs_to_vcf_${PROJECTNAME}_chr"$chr".log -t ${QUEUE_PROB2VCF} --mem=${VMEM_PROB2VCF} --mail-user=${EMAIL} --mail-type=${MAILTYPE} -D ${PROJECTDIR}/vcf_chr"$chr" ${PROJECTDIR}/vcf_chr"$chr"/run_allele_probs_to_vcf_${PROJECTNAME}_chr"$chr".sh
 
         sleep 1
 	
@@ -172,15 +176,25 @@ else
     
     for chr in ${CHROMOSOMES}
     do
+	PROB2VCF=probs_to_vcf_${PROJECTNAME}
+	PROBRUN=$(sacct --format="JobID,JobName%30,State" | awk -v prob=${PROB2VCF} '$2 ~ prob {print $0}' | awk '$3 == "RUNNING" || $3 == "PENDING" {print $1}' | awk 'END{ print NR }')
+#	if [[ $PROBRUN -ne 0 ]]; then 
+	echo "Chromosome ${chr}"
 	prob_files=`ls -1 ${PROJECTDIR}/vcf_chr"$chr"/*allele_probs.gz 2>/dev/null | wc -l`
 	vcf_files=`ls -1 ${PROJECTDIR}/vcf_chr"$chr"/*vcf.gz 2>/dev/null | wc -l`
 	importantnote "Converting IMPUTE2 files to VCF files"
-	while [ ${prob_files} -ne ${vcf_files} ]; do
-	    importantnote "Converting IMPUTE2 files to VCF files"
-	    sleep 40
-	    echo "${prob_files}"
-	    vcf_files=`ls -1 ${PROJECTDIR}/vcf_chr21/*vcf.gz 2>/dev/null | wc -l`
-	    echo "${vcf_files}"
+	while [[ ${prob_files} -ne ${vcf_files} ]]; do
+	    if [[ $PROBRUN -ne 0 ]]; then
+		importantnote "Converting IMPUTE2 files to VCF files"
+		sleep 40
+		#	    echo "${prob_files}"
+		vcf_files=`ls -1 ${PROJECTDIR}/vcf_chr"$chr"/*vcf.gz 2>/dev/null | wc -l`
+		echo "${vcf_files} out of ${prob_files}"
+		PROBRUN=$(sacct --format="JobID,JobName%30,State" | awk -v prob=${PROB2VCF} '$2 ~ prob {print $0}' | awk '$3 == "RUNNING" || $3 == "PENDING" {print $1}' | awk 'END{ print NR }')
+	    else
+		echo "The is no conversion of IMPUTE2 file to VCF"
+		exit 1
+	    fi
 	done
     done
 

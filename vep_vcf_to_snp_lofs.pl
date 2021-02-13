@@ -164,7 +164,7 @@ sub update_SNP_lofs {
       next unless $transcript->{BIOTYPE} eq "protein_coding"; #Skip transcripts or other features that are not protein-coding according to ENSEMBL.
 
       if ( $transcript->{LoF} and $transcript->{LoF} eq "HC" ) { #High-confidence loss-of-function variant.
-	my $SNP_ID = join "\t" , ( $parsed_line->{id} , $transcript->{Gene} , $transcript->{SYMBOL} , ); #E.g. "ENSG000123\tHLA-DRA\tENST01234"
+	my $SNP_ID = join "\t" , ( $parsed_line->{id} , $transcript->{Consequence} , $transcript->{Gene} , $transcript->{SYMBOL} ); #E.g. "ENSG000123\tHLA-DRA\tENST01234"
 	my $LoF_string    = $parsed_line->{id} . '_' . $transcript->{Consequence}; #E.g. 'rs1234_stop_gained'.
 
 	my $individual_index = 0; #The index of the individual (human) whose genotype is under consideration.
@@ -240,7 +240,7 @@ sub write_output_file {
   #If that variable doesn't exist, set it to the missing value $MISSING_LOF_VALUE.
   my ( $SNPs , $sample_names , $output_file ) = @_;
   my $output = IO::File->new( $output_file , 'w' );
-  $output->print( join "\t" , ( 'SNP_ID' , 'gene_ID' , 'gene_symbol' , 'single_copy_LoF_frequency' ,'two_copy_LoF_frequency' , @$sample_names ) ); #Print output header.
+  $output->print( join "\t" , ( 'SNP_ID' , 'Consequence' , 'gene_ID' , 'gene_symbol' , 'single_copy_LoF_frequency' ,'two_copy_LoF_frequency' , @$sample_names ) ); #Print output header.
   $output->print( "\n" );
 
   for my $SNP ( keys %$SNPs ) {

@@ -30,8 +30,8 @@ print {$out} $header; #Pass along the single header line.
 while ( <$in> ) {
   chomp;
   my @fields = split /\t/;
-  my ( $SNP_ID , $gene_ID , $gene_symbol , $single_copy_LoF_frequency, $two_copy_LoF_frequency ) = ( shift @fields , shift @fields, shift @fields , shift @fields , shift @fields ); #Explicitly assign these first fields, which don't have LoF strings.
-  print {$out} join "\t" , ( $SNP_ID , $gene_ID , $gene_symbol , $single_copy_LoF_frequency , $two_copy_LoF_frequency );
+  my ( $SNP_ID , $Consequence , $gene_ID , $gene_symbol , $single_copy_LoF_frequency, $two_copy_LoF_frequency ) = ( shift @fields , shift @fields, shift @fields , shift @fields , shift @fields , shift @fields ); #Explicitly assign these first fields, which don't have LoF strings.
+  print {$out} join "\t" , ( $SNP_ID ,  $Consequence , $gene_ID , $gene_symbol , $single_copy_LoF_frequency , $two_copy_LoF_frequency );
   for ( @fields ) {
     print {$out} "\t" , lof_string_to_lof_count( $_ );
   }
