@@ -8,7 +8,7 @@ use feature qw/ say /;
 
 my $RAISON_DETRE = << "La belle dame sans merci...";
 
-gene_lofs_to_lof_snps version 0.01, copyright 2016 Brian Sebastian Cole, PhD.
+gene_lofs_to_lof_snps version 0.02, copyright 2020 Brian Sebastian Cole, PhD and Abdulrahman Alasiri.
 Given a file containing rows representing genes and cells containing LoF strings,
   generate a new output file containing LoF SNPs and their allele frequency.
 
@@ -43,6 +43,10 @@ sub parse_line {
   my $HGNC_ID    = shift @fields;
   my $single_f   = shift @fields;
   my $double_f   = shift @fields;
+  my $het_carr = shift @fields;
+  my $hom_carr = shift @fields;
+  my $c_het_carr = shift @fields;
+
 
   #The rest of the fields contain phased LoF strings. Collect them into hashes of counts.
   my %snp_counts; #Key by lof_string, value by count.

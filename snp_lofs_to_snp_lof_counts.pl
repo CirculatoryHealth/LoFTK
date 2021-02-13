@@ -5,8 +5,8 @@ use strict;
 use autodie;
 
 #gene_lofs_to_gene_lof_counts
-#Copyright Brian S. Cole, PhD 2015, 2016
-#Given a *.gene_lofs file with the phased LoF strings reported by vep_vcf_to_gene_lofs, replace the LoF strings with LoF count.
+#Copyright Abdulrahman Alasiri, 2020
+#Given a *.snp_lofs file with the phased LoF strings reported by vep_vcf_to_snp_lofs, replace the LoF strings with LoF count.
 
 sub lof_string_to_lof_count {
   my $lof_string = shift;
@@ -30,8 +30,8 @@ print {$out} $header; #Pass along the single header line.
 while ( <$in> ) {
   chomp;
   my @fields = split /\t/;
-  my ( $SNP_ID , $Consequence , $gene_ID , $gene_symbol , $single_copy_LoF_frequency, $two_copy_LoF_frequency ) = ( shift @fields , shift @fields, shift @fields , shift @fields , shift @fields , shift @fields ); #Explicitly assign these first fields, which don't have LoF strings.
-  print {$out} join "\t" , ( $SNP_ID ,  $Consequence , $gene_ID , $gene_symbol , $single_copy_LoF_frequency , $two_copy_LoF_frequency );
+  my ( $SNP_ID , $Allele , $Consequence , $gene_ID , $gene_symbol , $heterozygous_LoF_frequency , $homozygous_LoF_frequency , $heterozygous_LoF_carriers , $homozygous_LoF_carriers ) = ( shift @fields , shift @fields, shift @fields , shift @fields , shift @fields , shift @fields , shift @fields , shift @fields , shift @fields ); #Explicitly assign these first fields, which don't have LoF strings.
+  print {$out} join "\t" , ( $SNP_ID , $Allele , $Consequence , $gene_ID , $gene_symbol , $heterozygous_LoF_frequency , $homozygous_LoF_frequency , $heterozygous_LoF_carriers , $homozygous_LoF_carriers );
   for ( @fields ) {
     print {$out} "\t" , lof_string_to_lof_count( $_ );
   }

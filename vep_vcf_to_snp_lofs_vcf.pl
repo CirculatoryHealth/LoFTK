@@ -9,10 +9,10 @@ use Getopt::Long;
 use IO::File;
 use IO::Zlib;
 
-my $PROGRAM_NAME       = 'vep_vcf_to_SNP_lofs';
+my $PROGRAM_NAME       = 'vep_vcf_to_snp_lofs';
 my $INVOCATION         = './' . $PROGRAM_NAME . ' -o output.lof';
 my $AUTHOR             = 'Brian Sebastian Cole, PhD & Abdulrahman Alasiri';
-my $VERSION            = 0.02;
+my $VERSION            = 0.03;
 my $RAISON_DETRE       = "When invoked in a directory containing *.vep.vcf files, iterate through all files and write a single VCF-style output file where the rows are variants and the genotype entries are phased lists of high-confidence loss-of-function mutations.";
 my @INFO_FIELDS        = qw/ CSQ /; #Specific to this flavor of VEP VCF.
 my $INFO_FIELD_DELIMITER = ';';
@@ -57,7 +57,7 @@ sub parse_consequence {
 
 sub parse_consequences {
   #my $consequences = parse_consequences( $raw_CSQ_attribute , $CSQ_fields )
-  #Given a scalar CSQ attribute (e.g. "CSQ=allele|type|gene|...,allele|type|gene|...") and a reference to an array containing the CSQ fields, 
+  #Given a scalar CSQ attribute (e.g. "CSQ=allele|type|gene|...,allele|type|gene|...") and a reference to an array containing the CSQ fields,
   # return a reference to an array of parsed consequences.
   my ( $raw_CSQ_attribute , $CSQ_fields ) = @_;
   $raw_CSQ_attribute =~ s/^CSQ=//; #Remove the attribute itself.
@@ -69,6 +69,7 @@ sub parse_info_field {
   #my $parsed_info_field = parse_info_field( $info_field , $CSQ_fields )
   #Given a scalar info field from LOFTEE+VEP, return a reference to a parsed hash.
   my ( $info_field , $CSQ_fields ) = ( @_ );
+  $info_field =~ s/.*CSQ=/CSQ=/; # Remove all srtings before CSQ
   my %parsed_info_field;
   @parsed_info_field{ @INFO_FIELDS } = split /$INFO_FIELD_DELIMITER/ , $info_field;
 
@@ -155,7 +156,7 @@ sub update_SNP_lofs {
     chomp $line;
     my $parsed_line = parse_vcf_line( $line , $CSQ_fields );
 
-    next unless $parsed_line->{filter} eq '.'; #Make it to accept any strings for filtered VCF files (\*)
+#    next unless $parsed_line->{filter} eq '.'; #Make it to accept any strings for filtered VCF files (\*)
 
     #Iterate over the transcripts that are affected by the variant.
     for my $transcript ( @{ $parsed_line->{info}->{CSQ} } ) { #Transcript is a reference to the parsed "individual consequence."
@@ -164,7 +165,7 @@ sub update_SNP_lofs {
       next unless $transcript->{BIOTYPE} eq "protein_coding"; #Skip transcripts or other features that are not protein-coding according to ENSEMBL.
 
       if ( $transcript->{LoF} and $transcript->{LoF} eq "HC" ) { #High-confidence loss-of-function variant.
-	my $SNP_ID = join "\t" , ( $parsed_line->{id} , $transcript->{Consequence} , $transcript->{Gene} , $transcript->{SYMBOL} ); #E.g. "ENSG000123\tHLA-DRA\tENST01234"
+	my $SNP_ID = join "\t" , ( $parsed_line->{id} , $transcript->{Allele} , $transcript->{Consequence} , $transcript->{Gene} , $transcript->{SYMBOL} ); #E.g. "ENSG000123\tHLA-DRA\tENST01234"
 	my $LoF_string    = $parsed_line->{id} . '_' . $transcript->{Consequence}; #E.g. 'rs1234_stop_gained'.
 
 	my $individual_index = 0; #The index of the individual (human) whose genotype is under consideration.
@@ -200,37 +201,48 @@ sub get_CAF {
   #my ( $single_copy_LoF_fraction , $two_copy_LoF_fraction )  = get_CAF( $transcripts , $transcript , $sample_names )
   #When given a reference to the transcripts data structure and a particular transcript to extract, and a reference to an array of sample names,
   # return a reference to a 2-element array of single-copy LoF frequency and two-copy LoF frequency (called "CAF" by some).
-  my ( $SNPs , $SNP , $sample_names ) = ( @_ );
+    my ( $SNPs , $SNP , $sample_names ) = ( @_ );
   my $total_samples = scalar @$sample_names; #Number of individuals.
   croak "Failed to extract sample count - can't compute LoF frequency.\n" unless $total_samples > 0;
   my ( $total_single_copy_LoF , $total_two_copy_LoF ) = ( 0 , 0 );
   for my $sample_index ( 0 .. $total_samples - 1 ) { #Iterate across individuals.
-    if ( $SNPs->{$SNP}->[$sample_index]->[0] ) { #First phase has at least one LoF variant.
-      if ( $SNPs->{$SNP}->[$sample_index]->[1] ) { #Second phase has LoF.
-	$total_two_copy_LoF++;
+#    if ( $SNPs->{$SNP}->[$sample_index]->[0] ) { #First phase has at least one LoF variant.
+#      if ( $SNPs->{$SNP}->[$sample_index]->[1] ) { #Second phase has LoF.
+      if ( $SNPs->{$SNP}[$sample_index][0] and $SNPs->{$SNP}[$sample_index][0] ne $MISSING_LOF_VALUE ) { #First phase has at least one LoF variant.
+	  if ( $SNPs->{$SNP}[$sample_index][1] and $SNPs->{$SNP}[$sample_index][1] ne $MISSING_LOF_VALUE ) { #Second phase has LoF.
+	      $total_two_copy_LoF++;
+	      
+	  }
+	  else {
+              $total_single_copy_LoF++; #First phase only: single copy LoF.
+          }
       }
-    }
-    else { #First phase has no LoF variants and was uninstantiated.
-      if ( $SNPs->{$SNP}->[$sample_index]->[1] ) {
-	$total_single_copy_LoF++;
+      else { #First phase has no LoF variants and was uninstantiated.
+#	  if ( $SNPs->{$SNP}->[$sample_index]->[1] ) {
+	  if ( $SNPs->{$SNP}[$sample_index][1] and $SNPs->{$SNP}[$sample_index][1] ne $MISSING_LOF_VALUE ) {
+	      $total_single_copy_LoF++;
+	  }
       }
+  }
+    #Now compute LoF fractions.
+    my ( $single_copy_LoF_fraction , $two_copy_LoF_fraction , $single_copy_LoF_fraction_carrier , $two_copy_LoF_fraction_carrier );
+    unless ( $total_single_copy_LoF == 0 ) {
+	$single_copy_LoF_fraction = $total_single_copy_LoF / $total_samples;
+	$single_copy_LoF_fraction_carrier = $total_single_copy_LoF ;
     }
-  }
-  #Now compute LoF fractions.
-  my ( $single_copy_LoF_fraction , $two_copy_LoF_fraction );
-  unless ( $total_single_copy_LoF == 0 ) {
-    $single_copy_LoF_fraction = $total_single_copy_LoF / $total_samples;
-  }
-  else {
-    $single_copy_LoF_fraction = 0;
-  }
-  unless ( $total_two_copy_LoF == 0 ) {
-    $two_copy_LoF_fraction = $total_two_copy_LoF / $total_samples;
-  }
-  else {
-    $two_copy_LoF_fraction = 0;
-  }
-  return ( $single_copy_LoF_fraction , $two_copy_LoF_fraction ); #Return two-element array reference.
+    else {
+	$single_copy_LoF_fraction = 0;
+	$single_copy_LoF_fraction_carrier = 0;
+    }
+    unless ( $total_two_copy_LoF == 0 ) {
+	$two_copy_LoF_fraction = $total_two_copy_LoF / $total_samples;
+	$two_copy_LoF_fraction_carrier = $total_two_copy_LoF;
+    }
+    else {
+	$two_copy_LoF_fraction = 0;
+	$two_copy_LoF_fraction_carrier = 0;
+    }
+    return ( $single_copy_LoF_fraction , $two_copy_LoF_fraction , $single_copy_LoF_fraction_carrier , $two_copy_LoF_fraction_carrier ); #Return two-element array reference.
 }
 
 sub write_output_file {
@@ -240,7 +252,9 @@ sub write_output_file {
   #If that variable doesn't exist, set it to the missing value $MISSING_LOF_VALUE.
   my ( $SNPs , $sample_names , $output_file ) = @_;
   my $output = IO::File->new( $output_file , 'w' );
-  $output->print( join "\t" , ( 'SNP_ID' , 'Consequence' , 'gene_ID' , 'gene_symbol' , 'single_copy_LoF_frequency' ,'two_copy_LoF_frequency' , @$sample_names ) ); #Print output header.
+#  $output->print( join "\t" , ( 'SNP_ID' , 'Consequence' , 'gene_ID' , 'gene_symbol' , 'single_copy_LoF_frequency' ,'two_copy_LoF_frequency' , @$sample_names ) ); #Print output header.
+  $output->print( join "\t" , ( 'SNP_ID' , 'Allele' , 'Consequence' , 'gene_ID' , 'gene_symbol' , 'heterozygous_LoF_frequency' ,'homozygous_LoF_frequency' , 'heterozygous_LoF_carriers' , 'homozygous_LoF_carriers' , @$sample_names ) ); #Print output header.
+
   $output->print( "\n" );
 
   for my $SNP ( keys %$SNPs ) {

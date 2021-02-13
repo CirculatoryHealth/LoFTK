@@ -96,10 +96,10 @@ else
     haps=`ls -1 ${ROOTDIR}/*haps.gz 2>/dev/null | wc -l`
     allele_probs=`ls -1 ${ROOTDIR}/*allele_probs.gz 2>/dev/null | wc -l`
     info=`ls -1 ${ROOTDIR}/*info 2>/dev/null | wc -l`
-    sample=`ls -1 ${ROOTDIR}/*sample 2>/dev/null | wc -l`
+    sample=`ls -1 ${ROOTDIR}/*samples 2>/dev/null | wc -l`
 
     ### Check if the directory has IMPUTE2 files [ haps.gz / allele_probs.gz / info / sample ]
-    if [[ $haps == 0 || $allele_probs == 0 || $info == 0 || $sample == 0 ]]; then
+    if [[ $haps -eq 0 || $allele_probs -eq 0 || $info -eq 0 || $sample -eq 0 ]]; then
     echoerrorflash "                                     *** Oh no! Computer says no! ***"
     echo ""
     script_arguments_error "When running a *** LoF analysis *** using IMPUTE2 files, you must supply 'haps.gz', 'allele_probs.gz', 'info' and 'sample' as INPUT_FILE_FORMAT!"

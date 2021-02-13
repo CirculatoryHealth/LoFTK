@@ -156,7 +156,7 @@ else
             fi
 	    
 	    PROJECTDIR=${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF/vcf_chr"$chr"
-	    cp ${ROOTDIR}/*chr"$chr".b37*.vcf.gz ${PROJECTDIR} #@# need fix, will copy all chr1 anything after 1 such 10, 11, 12 .. 
+	    cp ${ROOTDIR}/*chr${chr}_*.vcf.gz ${PROJECTDIR} #@# need fix, will copy all chr1 anything after 1 such 10, 11, 12 .. 
 	    echo "${PROJECTNAME}"
 	    VCFDIR=${PROJECTDIR}
 	    echo "${VCFDIR}"
@@ -183,7 +183,11 @@ else
                     echo ${c%%.vcf.gz}_${count}.sh
 		    
 		    echo "#!/bin/bash" > ${c%%.vcf.gz}_${count}.sh
-		    echo "${VEP} --input_file $c --output_file ${c%.gz}.vep.vcf --vcf --offline --phased --assembly GRCh37 --protein --canonical -plugin LoF,loftee_path:${LOFTEE},human_ancestor_fa:${HUMAN_ANCESTOR_FA},conservation_file:${CONSERVATION_FILE} --dir_plugins ${LOFTEE} --cache --dir_cache ${CACHEDIR} -port 3337 --force_overwrite" >> ${c%%.vcf.gz}_${count}.sh
+		    echo "${VEP} --input_file $c --output_file ${c%.gz}.raw_vep.vcf --vcf --offline --phased --assembly GRCh37 --protein --canonical -plugin LoF,loftee_path:${LOFTEE},human_ancestor_fa:${HUMAN_ANCESTOR_FA},conservation_file:${CONSERVATION_FILE} --dir_plugins ${LOFTEE} --cache --dir_cache ${CACHEDIR} -port 3337 --force_overwrite" >> ${c%%.vcf.gz}_${count}.sh
+		    echo "${ENSEMBL}/filter_vep -i ${c%.gz}.raw_vep.vcf -o ${c%.gz}.vep.vcf -filter "LoF is HC" --only_matched --force_overwrite" >> ${c%%.vcf.gz}_${count}.sh
+
+#@#		    echo "${VEP} --input_file $c --output_file stdout --vcf --offline --phased --assembly GRCh37 --protein --canonical -plugin LoF,loftee_path:${LOFTEE},human_ancestor_fa:${HUMAN_ANCESTOR_FA},conservation_file:${CONSERVATION_FILE} --dir_plugins ${LOFTEE} --cache --dir_cache ${CACHEDIR} -port 3337 | ${ENSEMBL}/filter_vep  -o ${c%.gz}.vep.vcf --filter "LoF is HC and not LC" --only_matched --force_overwrite" >> ${c%.vcf.gz}_${count}.sh
+
 		    echo "gzip $c " >> ${c%.vcf.gz}_${count}.sh
 		    echo "gzip ${c%.gz}.vep.vcf " >> ${c%%.vcf.gz}_${count}.sh
 		    if [ ${FILE_FORMAT} == "IMPUTE2" ]; then #@# why ? YES I got it, because we have to wait for converting impute data to VCF
@@ -226,11 +230,16 @@ else
                     echo ${c%.vcf.gz}_${count}.sh
 
 		    echo "#!/bin/bash" > ${c%%.vcf.gz}_${count}.sh
-                    echo "${VEP} --input_file $c --output_file stdout --vcf --offline --phased --assembly GRCh38 --protein --canonical -plugin LoF,loftee_path:${LOFTEE},human_ancestor_fa:${HUMAN_ANCESTOR_FA},conservation_file:${CONSERVATION_FILE},gerp_bigwig:${GERP_BIGWIG} --dir_plugins ${LOFTEE} --cache --dir_cache ${CACHEDIR} | ${ENSEMBL}/filter_vep  -o ${c%.gz}.vep.vcf --filter "LoF is HC" --only_matched --force_overwrite" >> ${c%.vcf.gz}_${count}.sh
+#                    echo "${VEP} --input_file $c --output_file ${c%.gz}.vep.vcf --vcf --offline --phased --assembly GRCh38 --protein --canonical -plugin LoF,loftee_path:${LOFTEE},human_ancestor_fa:${HUMAN_ANCESTOR_FA},conservation_file:${CONSERVATION_FILE},gerp_bigwig:${GERP_BIGWIG} --dir_plugins ${LOFTEE} --cache --dir_cache ${CACHEDIR} --force_overwrite" >> ${c%.vcf.gz}_${count}.sh
+
+		    echo "${VEP} --input_file $c --output_file ${c%.gz}.raw_vep.vcf --vcf --offline --phased --assembly GRCh38 --protein --canonical -plugin LoF,loftee_path:${LOFTEE},human_ancestor_fa:${HUMAN_ANCESTOR_FA},conservation_file:${CONSERVATION_FILE},gerp_bigwig:${GERP_BIGWIG} --dir_plugins ${LOFTEE} --cache --dir_cache ${CACHEDIR} --force_overwrite" >> ${c%.vcf.gz}_${count}.sh
+		    echo "${ENSEMBL}/filter_vep -i ${c%.gz}.raw_vep.vcf -o ${c%.gz}.vep.vcf -filter "LoF is HC" --only_matched --force_overwrite" >> ${c%%.vcf.gz}_${count}.sh
+
+
 		    echo "gzip $c " >> ${c%.vcf.gz}_${count}.sh
                     echo "gzip ${c%.gz}.vep.vcf " >> ${c%.vcf.gz}_${count}.sh
 
-		    sbatch --job-name=VEP_${PROJECTNAME}_chr"$chr"_$count -e VEP_${PROJECTNAME}_chr"$chr"_$count.error -o VEP_${PROJECTNAME}_chr"$chr"_$count.log -t ${QUEUE_ANNOTATION} --mem=${VMEM_ANNOTATION} --mail-user=${EMAIL} --mail-type=${MAILTYPE} -D ${VCFDIR} ${c%%.vcf.gz}_${count}.sh
+		    sbatch --job-name=VEP_${PROJECTNAME}_chr"$chr"_$count -e VEP_${PROJECTNAME}_chr"$chr"_$count.error -o VEP_${PROJECTNAME}_chr"$chr"_$count.log -t ${QUEUE_ANNOTATION} --mem=${VMEM_ANNOTATION} --mail-user=${EMAIL} -c 6 --mail-type=${MAILTYPE} -D ${VCFDIR} ${c%%.vcf.gz}_${count}.sh
 
                     sleep 5
                     ((count++))
