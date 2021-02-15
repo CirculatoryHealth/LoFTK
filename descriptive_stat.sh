@@ -44,31 +44,31 @@ function importantnote {
     echo -e "${CYAN}${1}${NONE}"
 }
 
-script_copyright_message() {
-    echoitalic ""
-    THISYEAR=$(date +'%Y')
-    echoitalic "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-    echoitalic "+ The MIT License (MIT)                                                                                 +"
-    echoitalic "+ Copyright (c) 2020-${THISYEAR} Abdulrahman Alasiri                                                        +"
-    echoitalic "+                                                                                                       +"
-    echoitalic "+ Permission is hereby granted, free of charge, to any person obtaining a copy of this software and     +"
-    echoitalic "+ associated documentation files (the \"Software\"), to deal in the Software without restriction,         +"
-    echoitalic "+ including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, +"
-    echoitalic "+ and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, +"
-    echoitalic "+ subject to the following conditions:                                                                  +"
-    echoitalic "+                                                                                                       +"
-    echoitalic "+ The above copyright notice and this permission notice shall be included in all copies or substantial  +"
-    echoitalic "+ portions of the Software.                                                                             +"
-    echoitalic "+                                                                                                       +"
-    echoitalic "+ THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT     +"
-    echoitalic "+ NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND                +"
-    echoitalic "+ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES  +"
-    echoitalic "+ OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN   +"
-    echoitalic "+ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                            +"
-    echoitalic "+                                                                                                       +"
+#script_copyright_message() {
+#    echoitalic ""
+#    THISYEAR=$(date +'%Y')
+#    echoitalic "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+#    echoitalic "+ The MIT License (MIT)                                                                                 +"
+#    echoitalic "+ Copyright (c) 2020-${THISYEAR} Abdulrahman Alasiri                                                        +"
+#    echoitalic "+                                                                                                       +"
+#    echoitalic "+ Permission is hereby granted, free of charge, to any person obtaining a copy of this software and     +"
+#    echoitalic "+ associated documentation files (the \"Software\"), to deal in the Software without restriction,         +"
+#    echoitalic "+ including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, +"
+#    echoitalic "+ and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, +"
+#    echoitalic "+ subject to the following conditions:                                                                  +"
+#    echoitalic "+                                                                                                       +"
+#    echoitalic "+ The above copyright notice and this permission notice shall be included in all copies or substantial  +"
+#    echoitalic "+ portions of the Software.                                                                             +"
+#    echoitalic "+                                                                                                       +"
+#    echoitalic "+ THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT     +"
+#    echoitalic "+ NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND                +"
+#    echoitalic "+ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES  +"
+#    echoitalic "+ OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN   +"
+#    echoitalic "+ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                            +"
+#    echoitalic "+                                                                                                       +"
 #    echoitalic "+ Reference: http://opensource.org.                                                                     +"
-    echoitalic "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-}
+#    echoitalic "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+#}
 
 script_arguments_error() {
     echoerror "Number of arguments found "$#"."
@@ -84,8 +84,8 @@ script_arguments_error() {
     echoerror "./run_loftk.sh [arg1]"    echoerror ""
     echoerror "========================================================================================================="
     # The wrong arguments are passed, so we'll exit the script now!
-    script_copyright_message
-    exit 1
+    #script_copyright_message
+    #exit 1
 }
 
 ### START of if-else statement for the number of command-line arguments passed ###
@@ -128,24 +128,6 @@ else
     PROB2VCF="probs_to_vcf_${PROJECTNAME}"
     VEP_ANNOTATION="VEP_${PROJECTNAME}_"
 
-    ### Check if the directory has VCF files for each chromosome
-    if [ ${FILE_FORMAT} == "VCF" ]; then
-      for chrr in ${CHROMOSOMES}
-      do
-        check_chr=$(ls ${ROOTDIR}/*chr${chrr}[!1-9]*vcf.gz)
-#        if [ ! -e ${ROOTDIR}/*chr${chrr}[!1-9]*vcf.gz ]; then
-        if [ ! -e ${check_chr} ]; then
-          echoerrorflash "There is no file for chromosome ${chrr} in the ROOTDIR:"
-          echoerrorflash "                        *** ERROR *** "
-          echoerrorflash "Something went wrong. You must have a file for chromosome ${chrr} in the ROOTDIR:"
-          echo "${ROOTDIR}"
-          echoerrorflash "OR, rename the file to have 'chr' before the chromosome number. e.g 'project_name_chr21.vcf.gz'"
-          echoerrorflash "                *** END OF ERROR MESSAGE *** "
-          exit 1
-        fi
-      done
-    fi
-
     ### Set up directory for VCF files
     if [ ! -d ${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF ]; then
         echo "The project directory doesn't exist; Mr. Bourne will make it for you."
@@ -158,41 +140,42 @@ else
     ### Annotation of LoF
     for chr in ${CHROMOSOMES}
     do
-      echobold "chr ${chr}"
-    	if [ ${FILE_FORMAT} == "IMPUTE2" ]; then
-        PROJECTDIR=${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF # where you want stuff to be save inside the rootdir
-  	    echo "${PROJECTNAME}"
-  	    VCFDIR=${PROJECTDIR}/vcf_chr"$chr"
-  	    echo "${VCFDIR}"
-
-    	elif [ ${FILE_FORMAT} == "VCF" ]; then
-        if [ ! -d ${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF/vcf_chr"$chr" ]; then
-          mkdir -v ${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF/vcf_chr"$chr"
-  	    elif [ "$(ls -A ${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF/vcf_chr"$chr")" ]; then
-          rm ${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF/vcf_chr"$chr"/*
-  	    else
-          echoerrorflash "This directory was empity from the beginning: ${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF/vcf_chr"$chr". "
-        fi
+	echo "chr ${chr}"
+	if [ ${FILE_FORMAT} == "IMPUTE2" ]; then
+	    PROJECTDIR=${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF # where you want stuff to be save inside the rootdir
+	    echo "${PROJECTNAME}"
+	    VCFDIR=${PROJECTDIR}/vcf_chr"$chr"
+	    echo "${VCFDIR}"
+	elif [ ${FILE_FORMAT} == "VCF" ]; then
+	    if [ ! -d ${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF/vcf_chr"$chr" ]; then
+		mkdir -v ${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF/vcf_chr"$chr"
+	    elif [ "$(ls -A ${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF/vcf_chr"$chr")" ]; then
+		rm ${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF/vcf_chr"$chr"/*
+	    else
+		echoerrorflash "This dirwctory was empity from the beginning: ${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF/vcf_chr"$chr". "
+            fi
 
 	    PROJECTDIR=${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF/vcf_chr"$chr"
+      #cp ${ROOTDIR}/*chr${chr}_*.vcf.gz ${PROJECTDIR} #@# need fix, will copy all chr1 anything after 1 such 10, 11, 12 ..
       cp ${ROOTDIR}/*chr${chr}[!1-9]*vcf.gz ${PROJECTDIR} #@# need fix, will copy all chr1 anything after 1 such 10, 11, 12 ..
 	    echo "${PROJECTNAME}"
 	    VCFDIR=${PROJECTDIR}
 	    echo "${VCFDIR}"
-
-	   else
-       echoerrorflash "                        *** ERROR *** "
-       echoerrorflash "Something went wrong. You must have to set the FILE_FORMAT in LoF_config to either IMPUTE2 or VCF. "
-       echoerrorflash "                *** END OF ERROR MESSAGE *** "
-       exit 1
-     fi
+	else
+            echoerrorflash "                        *** ERROR *** "
+            echoerrorflash "Something went wrong. You must have to set the FILE_FORMAT in LoF_config to either IMPUTE2 or VCF. "
+            echoerrorflash "                *** END OF ERROR MESSAGE *** "
+            exit 1
+	fi
 
     ### VEP ANALYSIS options
 
-	   if [ ${ASSEMBLY} == "GRCh37" ]; then
+	if [ ${ASSEMBLY} == "GRCh37" ]; then
 	    echo "Annotation of LoF variants using VEP along with LOFTEE plugin. Data type is ${DATA_TYPE} with ${ASSEMBLY} assembly."
             count=1
 	    for c in ${VCFDIR}/*.vcf.gz
+#	    for c in ${PROJECTDIR}/vcf_chr"$chr"/*.phased.vcf.gz #@# need change if input VCF
+#	    for c in ${PROJECTDIR}/*.phased.vcf.gz
 
 	    do
 		if [ ! -e ${c%%.gz}.vep.vcf.gz ]; then
@@ -462,6 +445,3 @@ else
 
 
 fi   # For [$# -lt 1]
-
-
-script_copyright_message

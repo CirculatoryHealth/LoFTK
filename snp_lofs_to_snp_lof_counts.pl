@@ -30,8 +30,8 @@ print {$out} $header; #Pass along the single header line.
 while ( <$in> ) {
   chomp;
   my @fields = split /\t/;
-  my ( $SNP_ID , $Allele , $Consequence , $gene_ID , $gene_symbol , $heterozygous_LoF_frequency , $homozygous_LoF_frequency , $heterozygous_LoF_carriers , $homozygous_LoF_carriers ) = ( shift @fields , shift @fields, shift @fields , shift @fields , shift @fields , shift @fields , shift @fields , shift @fields , shift @fields ); #Explicitly assign these first fields, which don't have LoF strings.
-  print {$out} join "\t" , ( $SNP_ID , $Allele , $Consequence , $gene_ID , $gene_symbol , $heterozygous_LoF_frequency , $homozygous_LoF_frequency , $heterozygous_LoF_carriers , $homozygous_LoF_carriers );
+  my ( $SNP_ID , $Consequence , $gene_ID , $gene_symbol , $heterozygous_LoF_frequency , $homozygous_LoF_frequency , $heterozygous_LoF_carriers , $homozygous_LoF_carriers ) = ( shift @fields , shift @fields , shift @fields , shift @fields , shift @fields , shift @fields , shift @fields , shift @fields ); #Explicitly assign these first fields, which don't have LoF strings.
+  print {$out} join "\t" , ( $SNP_ID , $Consequence , $gene_ID , $gene_symbol , $heterozygous_LoF_frequency , $homozygous_LoF_frequency , $heterozygous_LoF_carriers , $homozygous_LoF_carriers );
   for ( @fields ) {
     print {$out} "\t" , lof_string_to_lof_count( $_ );
   }
