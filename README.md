@@ -18,7 +18,7 @@ Predicted Loss-of-Function (LoF) variants in human genes are important due to th
 ## Installation and use
 
 ### Requirements
-All scripts are annotated for debugging purposes - and future reference. The scripts will work within the context of a certain Linux environment - in this case we have tested **LoFToolKit** on CentOS7 with a SLURM Grid Engine background.
+All scripts are annotated for debugging purposes - and future reference. The scripts will work within the context of a certain Linux environment - in this case we have tested **LoFTK** on CentOS7 with a SLURM Grid Engine background.
 
 - [Ensembl Variant Effect Predictor (VEP)](https://github.com/Ensembl/ensembl-vep)
 - `Perl >= 5.10.1`
