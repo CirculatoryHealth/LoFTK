@@ -4,7 +4,7 @@ LOFTK (Loss-of-Function ToolKit)
 [![DOI]()]()
 
 #### This readme
-This readme accompanies the paper _"LOFTK: a framework for fully automated calculation of predicted Loss-of-Function variants."_ by [Alasiri A. *et al*. **bioRxiv 2019**]().
+This readme accompanies the paper _"LOFTK: a framework for fully automated calculation of predicted Loss-of-Function variants."_ by [Alasiri A. *et al*. **bioRxiv 2021**]().
 
 --------------
 
