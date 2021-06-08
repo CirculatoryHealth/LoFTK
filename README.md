@@ -1,9 +1,10 @@
 LOFTK (Loss-of-Function ToolKit)
 ============
 
-*Authors*</br>
-A. Alasiri<sup>1,2</sup>, K. J. Karczewski<sup>3,4</sup>, B. Cole<sup>5</sup>, B. Loza<sup>6</sup>, J. H. Moore<sup>7</sup>, S. W. van der Laan<sup>8</sup>, F. W. Asselbergs<sup>1,9,10</sup>, B. J. Keating<sup>6</sup>, J. van Setten<sup>1</sup>. <br>
-<sup><sup>1</sup> Department of Cardiology, Division Heart and Lungs, University Medical Center Utrecht, University of Utrecht, Utrecht, Netherlands; <sup>2</sup> Medical Genomics Research Department, King Abdullah International Medical Research Center, King Saud Bin Abdulaziz University for Health Sciences, Ministry of National Guard Health Affairs, Riyadh, Saudi Arabia; <sup>3</sup> Program in Medical and Population Genetics, Broad Institute of MIT and Harvard, Cambridge, MA, United States; <sup>4</sup> Analytic and Translational Genetics Unit, Massachusetts General Hospital, Boston, MA, United States; <sup>5</sup> Bioinformatics Core, Harvard Medical School, Boston, MA, United States; <sup>6</sup> Perelman School of Medicine, University of Pennsylvania, Philadelphia, PA, United States; <sup>7</sup> Institute for Biomedical Informatics, University of Pennsylvania, Philadelphia, PA, United States; <sup>8</sup> Central Diagnostic Laboratory, Division Laboratories, Pharmacy, and Biomedical genetics, University Medical Center Utrecht, University of Utrecht, Utrecht, Netherlands; <sup>9</sup> Health Data Research UK and Institute of Health Informatics, University College London, London, United Kingdom; <sup>10</sup> Institute of Cardiovascular Science, Faculty of Population Health Sciences, University College London, London, United Kingdom.</sup>
+[![DOI]()]()
+
+#### This readme
+This readme accompanies the paper _"LOFTK: a framework for fully automated calculation of predicted Loss-of-Function variants."_ by [Alasiri A. *et al*. **bioRxiv 2019**]().
 
 --------------
 
