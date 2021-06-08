@@ -13,6 +13,11 @@ Predicted Loss-of-Function (LoF) variants in human genes are important due to th
 
 **LoFTK** is a pipeline written in the `BASH` and `Perl` languages to identify loss-of function (LoF) variants using [`VEP`](https://github.com/Ensembl/ensembl-vep) and [`LOFTEE`](https://github.com/konradjk/loftee) efficiently. It will aid in annotating LoF variants, select high confidence (HC) variants, state the homozygous and heterozygous LoF variants, and calculate statistics.
 
+
+**The Loss-of-Function ToolKit Workflow: finding knockouts using genotyped and sequenced genomes.**
+![The Loss-of-Function ToolKit Workflow: finding knockouts using genotyped and sequenced genomes.](images/workflow.png)
+
+
 --------------
 
 ## Installation and use
