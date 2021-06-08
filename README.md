@@ -37,7 +37,7 @@ Remember to set all options in the `LoF.config` file before the run and always u
 
 Creative Commons Attribution-ShareAlike 4.0 International Public License
 
-By exercising the Licensed Rights (defined in the [LICENSE](LICENSE.md)), you accept and agree to be bound by the terms and conditions of this Creative Commons Attribution-ShareAlike 4.0 International Public License ("Public License"). To the extent this Public License may be interpreted as a contract, you are granted the Licensed Rights in consideration of your acceptance of these terms and conditions, and the Licensor grants you such rights in consideration of benefits the Licensor receives from making the Licensed Material available under these terms and conditions.
+By exercising the Licensed Rights (defined in the [LICENSE](LICENSE)), you accept and agree to be bound by the terms and conditions of this Creative Commons Attribution-ShareAlike 4.0 International Public License ("Public License"). To the extent this Public License may be interpreted as a contract, you are granted the Licensed Rights in consideration of your acceptance of these terms and conditions, and the Licensor grants you such rights in consideration of benefits the Licensor receives from making the Licensed Material available under these terms and conditions.
 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
