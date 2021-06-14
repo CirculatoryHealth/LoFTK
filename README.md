@@ -1,37 +1,15 @@
-# LOFTK (Loss-of-Function ToolKit)
+LOFTK (Loss-of-Function ToolKit)
+============
 
-<<<<<<< HEAD
-
-LoFToolKit is a pipeline written in the BASH and Perl languages to identify loss-of function (LoF) variants using VEP and LOFTEE efficiently. It will aid in annotating LoF variants, select high confidence (HC) variants, state the homozygous and heterozygous LoF variants, and calculate statistics. 
-=======
 [![DOI]()]()
 
 #### This readme
 This readme accompanies the paper _"LOFTK: a framework for fully automated calculation of predicted Loss-of-Function variants."_ by [Alasiri A. *et al*. **bioRxiv 2021**]().
->>>>>>> 5faa69204cf3a0b30ef3e30a56f5c6fd27fd1e96
 
-All scripts are annotated for debugging purposes - and future reference. The scripts will work within the context of a certain Linux environment (in this case a CentOS7 system on a SUN Grid Engine background). As such we have tested LOFToolKit on CentOS6.6, CentOS7, and OS X El Capitan (version 1.0.[x])
+--------------
 
 ## Background
 
-<<<<<<< HEAD
-## Requirements
-VEP
-Perl >= 5.10.1
-Bash
-LOFTEE
-Ancestral sequence (human_ancestor.fa[.gz|.rz])
-Samtools (must be on path)
-PhyloCSF database (phylocsf.sql) for conservation filters
-
-## Usage
-The only script the user should use is the run_loftk.sh script in conjunction with a configuration file LoF.config.
-
-By typing...
-bash run_loftk.sh $(pwd)/LoF.config
-
-.. the user will set all options in the LoF.config file. 
-=======
 Predicted Loss-of-Function (LoF) variants in human genes are important due to their impact on clinical phenotypes and frequent occurrence in the genomes of healthy individuals. Current approaches predict high-confidence LoF variants without identifying the specific genes or the number of copies they affect. Here we present an open source tool, the **Loss-of-Function ToolKit (LoFTK)**, which allows efficient and automated prediction of LoF variants from both genotyped and sequenced genomes, identifying genes that are inactive in one or two copies, and providing summary statistics for downstream analyses. 
 
 **LoFTK** is a pipeline written in the `BASH` and `Perl` languages to identify loss-of function (LoF) variants using [`VEP`](https://github.com/Ensembl/ensembl-vep) and [`LOFTEE`](https://github.com/konradjk/loftee) efficiently. It will aid in annotating LoF variants, select high confidence (HC) variants, state the homozygous and heterozygous LoF variants, and calculate statistics.
@@ -116,4 +94,3 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 Reference: https://choosealicense.com/licenses/cc-by-sa-4.0/#.
->>>>>>> 5faa69204cf3a0b30ef3e30a56f5c6fd27fd1e96
