@@ -44,31 +44,31 @@ function importantnote {
     echo -e "${CYAN}${1}${NONE}"
 }
 
-script_copyright_message() {
-    echoitalic ""
-    THISYEAR=$(date +'%Y')
-    echoitalic "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-    echoitalic "+ The MIT License (MIT)                                                                                 +"
-    echoitalic "+ Copyright (c) 2020-${THISYEAR} Abdulrahman Alasiri                                                        +"
-    echoitalic "+                                                                                                       +"
-    echoitalic "+ Permission is hereby granted, free of charge, to any person obtaining a copy of this software and     +"
-    echoitalic "+ associated documentation files (the \"Software\"), to deal in the Software without restriction,         +"
-    echoitalic "+ including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, +"
-    echoitalic "+ and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, +"
-    echoitalic "+ subject to the following conditions:                                                                  +"
-    echoitalic "+                                                                                                       +"
-    echoitalic "+ The above copyright notice and this permission notice shall be included in all copies or substantial  +"
-    echoitalic "+ portions of the Software.                                                                             +"
-    echoitalic "+                                                                                                       +"
-    echoitalic "+ THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT     +"
-    echoitalic "+ NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND                +"
-    echoitalic "+ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES  +"
-    echoitalic "+ OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN   +"
-    echoitalic "+ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                            +"
-    echoitalic "+                                                                                                       +"
+#script_copyright_message() {
+#    echoitalic ""
+#    THISYEAR=$(date +'%Y')
+#    echoitalic "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+#    echoitalic "+ The MIT License (MIT)                                                                                 +"
+#    echoitalic "+ Copyright (c) 2020-${THISYEAR} Abdulrahman Alasiri                                                        +"
+#    echoitalic "+                                                                                                       +"
+#    echoitalic "+ Permission is hereby granted, free of charge, to any person obtaining a copy of this software and     +"
+#    echoitalic "+ associated documentation files (the \"Software\"), to deal in the Software without restriction,         +"
+#    echoitalic "+ including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, +"
+#    echoitalic "+ and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, +"
+#    echoitalic "+ subject to the following conditions:                                                                  +"
+#    echoitalic "+                                                                                                       +"
+#    echoitalic "+ The above copyright notice and this permission notice shall be included in all copies or substantial  +"
+#    echoitalic "+ portions of the Software.                                                                             +"
+#    echoitalic "+                                                                                                       +"
+#    echoitalic "+ THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT     +"
+#    echoitalic "+ NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND                +"
+#    echoitalic "+ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES  +"
+#    echoitalic "+ OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN   +"
+#    echoitalic "+ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                            +"
+#    echoitalic "+                                                                                                       +"
 #    echoitalic "+ Reference: http://opensource.org.                                                                     +"
-    echoitalic "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-}
+#    echoitalic "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+#}
 
 script_arguments_error() {
     echoerror "Number of arguments found "$#"."
@@ -84,8 +84,8 @@ script_arguments_error() {
     echoerror "./run_loftk.sh [arg1]"    echoerror ""
     echoerror "========================================================================================================="
     # The wrong arguments are passed, so we'll exit the script now!
-    script_copyright_message
-    exit 1
+    #script_copyright_message
+    #exit 1
 }
 
 ### START of if-else statement for the number of command-line arguments passed ###
@@ -114,6 +114,9 @@ else
     ## Calculation of LoF variants.
     QUEUE_LOF_SNP=${QUEUE_LOF_SNP_CONFIG}
     VMEM_LOF_SNP=${VMEM_LOF_SNP_CONFIG}
+    ## Statisctical Description
+    QUEUE_STAT_DESC=${QUEUE_STAT_DESC_CONFIG}
+    VMEM_STAT_DESC=${VMEM_STAT_DESC_CONFIG}
 
     ### MAIL SETTINGS
     EMAIL=${YOUREMAIL}
@@ -128,24 +131,6 @@ else
     PROB2VCF="probs_to_vcf_${PROJECTNAME}"
     VEP_ANNOTATION="VEP_${PROJECTNAME}_"
 
-    ### Check if the directory has VCF files for each chromosome
-    if [ ${FILE_FORMAT} == "VCF" ]; then
-      for chrr in ${CHROMOSOMES}
-      do
-        check_chr=$(ls ${ROOTDIR}/*chr${chrr}[!1-9]*vcf.gz)
-#        if [ ! -e ${ROOTDIR}/*chr${chrr}[!1-9]*vcf.gz ]; then
-        if [ ! -e ${check_chr} ]; then
-          echoerrorflash "There is no file for chromosome ${chrr} in the ROOTDIR:"
-          echoerrorflash "                        *** ERROR *** "
-          echoerrorflash "Something went wrong. You must have a file for chromosome ${chrr} in the ROOTDIR:"
-          echo "${ROOTDIR}"
-          echoerrorflash "OR, rename the file to have 'chr' before the chromosome number. e.g 'project_name_chr21.vcf.gz'"
-          echoerrorflash "                *** END OF ERROR MESSAGE *** "
-          exit 1
-        fi
-      done
-    fi
-
     ### Set up directory for VCF files
     if [ ! -d ${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF ]; then
         echo "The project directory doesn't exist; Mr. Bourne will make it for you."
@@ -158,42 +143,42 @@ else
     ### Annotation of LoF
     for chr in ${CHROMOSOMES}
     do
-      echobold "chr ${chr}"
-    	if [ ${FILE_FORMAT} == "IMPUTE2" ]; then
-        PROJECTDIR=${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF # where you want stuff to be save inside the rootdir
-  	    echo "${PROJECTNAME}"
-  	    VCFDIR=${PROJECTDIR}/vcf_chr"$chr"
-  	    echo "${VCFDIR}"
-
-    	elif [ ${FILE_FORMAT} == "VCF" ]; then
-        if [ ! -d ${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF/vcf_chr"$chr" ]; then
-          mkdir -v ${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF/vcf_chr"$chr"
-  	    elif [ "$(ls -A ${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF/vcf_chr"$chr")" ]; then
-          rm ${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF/vcf_chr"$chr"/*
-  	    else
-          echoerrorflash "This directory was empity from the beginning: ${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF/vcf_chr"$chr". "
-        fi
+	echobold "chr ${chr}"
+	if [ ${FILE_FORMAT} == "IMPUTE2" ]; then
+	    PROJECTDIR=${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF # where you want stuff to be save inside the rootdir
+	    echo "${PROJECTNAME}"
+	    VCFDIR=${PROJECTDIR}/vcf_chr"$chr"
+	    echo "${VCFDIR}"
+	elif [ ${FILE_FORMAT} == "VCF" ]; then
+	    if [ ! -d ${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF/vcf_chr"$chr" ]; then
+		mkdir -v ${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF/vcf_chr"$chr"
+	    elif [ "$(ls -A ${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF/vcf_chr"$chr")" ]; then
+		rm ${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF/vcf_chr"$chr"/*
+	    else
+		echoerrorflash "This directory was empity from the beginning: ${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF/vcf_chr"$chr". "
+            fi
 
 	    PROJECTDIR=${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF/vcf_chr"$chr"
-      cp ${ROOTDIR}/*chr${chr}[!1-9]*vcf.gz ${PROJECTDIR} #@# need fix, will copy all chr1 anything after 1 such 10, 11, 12 ..
+	    GET_VCF=$(ls ${ROOTDIR}/*.vcf.gz | head -1)
+	    VCF_NAME=$(echo "${GET_VCF/chr[0-9][0-9]/chr${chr}}")
+	    cp ${VCF_NAME} ${PROJECTDIR}
+
 	    echo "${PROJECTNAME}"
 	    VCFDIR=${PROJECTDIR}
 	    echo "${VCFDIR}"
-
-	   else
-       echoerrorflash "                        *** ERROR *** "
-       echoerrorflash "Something went wrong. You must have to set the FILE_FORMAT in LoF_config to either IMPUTE2 or VCF. "
-       echoerrorflash "                *** END OF ERROR MESSAGE *** "
-       exit 1
-     fi
+	else
+            echoerrorflash "                        *** ERROR *** "
+            echoerrorflash "Something went wrong. You must have to set the FILE_FORMAT in LoF_config to either IMPUTE2 or VCF. "
+            echoerrorflash "                *** END OF ERROR MESSAGE *** "
+            exit 1
+	fi
 
     ### VEP ANALYSIS options
 
-	   if [ ${ASSEMBLY} == "GRCh37" ]; then
+	if [ ${ASSEMBLY} == "GRCh37" ]; then
 	    echo "Annotation of LoF variants using VEP along with LOFTEE plugin. Data type is ${DATA_TYPE} with ${ASSEMBLY} assembly."
             count=1
 	    for c in ${VCFDIR}/*.vcf.gz
-
 	    do
 		if [ ! -e ${c%%.gz}.vep.vcf.gz ]; then
                     echo $c
@@ -201,22 +186,12 @@ else
                     echo ${c%%.vcf.gz}_${count}.sh
 
 		    echo "#!/bin/bash" > ${c%%.vcf.gz}_${count}.sh
-		    echo "${VEP} --input_file $c --output_file ${c%.gz}.raw_vep.vcf --vcf --offline --phased --assembly GRCh37 --protein --canonical -plugin LoF,loftee_path:${LOFTEE},human_ancestor_fa:${HUMAN_ANCESTOR_FA},conservation_file:${CONSERVATION_FILE} --dir_plugins ${LOFTEE} --cache --dir_cache ${CACHEDIR} -port 3337 --force_overwrite" >> ${c%%.vcf.gz}_${count}.sh
-		    echo "${ENSEMBL}/filter_vep -i ${c%.gz}.raw_vep.vcf -o ${c%.gz}.vep.vcf -filter "LoF is HC" --only_matched --force_overwrite" >> ${c%%.vcf.gz}_${count}.sh
-
-#@#		    echo "${VEP} --input_file $c --output_file stdout --vcf --offline --phased --assembly GRCh37 --protein --canonical -plugin LoF,loftee_path:${LOFTEE},human_ancestor_fa:${HUMAN_ANCESTOR_FA},conservation_file:${CONSERVATION_FILE} --dir_plugins ${LOFTEE} --cache --dir_cache ${CACHEDIR} -port 3337 | ${ENSEMBL}/filter_vep  -o ${c%.gz}.vep.vcf --filter "LoF is HC and not LC" --only_matched --force_overwrite" >> ${c%.vcf.gz}_${count}.sh
+		    echo "${VEP} --input_file $c --output_file ${c%.gz}.vep.vcf --vcf --offline --phased --assembly GRCh37 --protein --canonical -plugin LoF,loftee_path:${LOFTEE},human_ancestor_fa:${HUMAN_ANCESTOR_FA},conservation_file:${CONSERVATION_FILE} --dir_plugins ${LOFTEE} --cache --dir_cache ${CACHEDIR} -port 3337 --force_overwrite" >> ${c%%.vcf.gz}_${count}.sh
 
 		    echo "gzip $c " >> ${c%.vcf.gz}_${count}.sh
 		    echo "gzip ${c%.gz}.vep.vcf " >> ${c%%.vcf.gz}_${count}.sh
 		    if [ ${FILE_FORMAT} == "IMPUTE2" ]; then #@# why ? YES I got it, because we have to wait for converting impute data to VCF
-#			PROBDEPENDACY=$(squeue -u ${USERNAME} | cat | awk '{print $1}' | tail -n +2 | ${LOFTK}/transpose.pl | sed 's/\t/,/g')
-#			PROB2VCF=probs_to_vcf_${PROJECTNAME}
-#			PROBDEPENDACY=$(sacct --format="JobID,JobName%30,State" | awk -v prob=${PROB2VCF} '$2 ~ prob {print $0}' | awk '$3 == "RUNNING" || $3 == "PENDING" {print $1}' | ${LOFTK}/transpose.pl | sed 's/\t/,/g')
 
-
-#		        echo ${PROBDEPENDACY}
-
-#			sbatch --job-name=VEP_${PROJECTNAME}_chr"$chr"_$count --dependency=afterok:${PROBDEPENDACY} -e VEP_${PROJECTNAME}_chr"$chr"_$count.error -o VEP_${PROJECTNAME}_chr"$chr"_$count.log -t 01:00:00 -D ${VCFDIR} ${c%%.vcf.gz}_${count}.sh
 			sbatch --job-name=VEP_${PROJECTNAME}_chr"$chr"_$count -e VEP_${PROJECTNAME}_chr"$chr"_$count.error -o VEP_${PROJECTNAME}_chr"$chr"_$count.log -t ${QUEUE_ANNOTATION} --mem=${VMEM_ANNOTATION} --mail-user=${EMAIL} --mail-type=${MAILTYPE} -D ${VCFDIR} ${c%%.vcf.gz}_${count}.sh
 
 
@@ -248,11 +223,7 @@ else
                     echo ${c%.vcf.gz}_${count}.sh
 
 		    echo "#!/bin/bash" > ${c%%.vcf.gz}_${count}.sh
-#                    echo "${VEP} --input_file $c --output_file ${c%.gz}.vep.vcf --vcf --offline --phased --assembly GRCh38 --protein --canonical -plugin LoF,loftee_path:${LOFTEE},human_ancestor_fa:${HUMAN_ANCESTOR_FA},conservation_file:${CONSERVATION_FILE},gerp_bigwig:${GERP_BIGWIG} --dir_plugins ${LOFTEE} --cache --dir_cache ${CACHEDIR} --force_overwrite" >> ${c%.vcf.gz}_${count}.sh
-
-		    echo "${VEP} --input_file $c --output_file ${c%.gz}.raw_vep.vcf --vcf --offline --phased --assembly GRCh38 --protein --canonical -plugin LoF,loftee_path:${LOFTEE},human_ancestor_fa:${HUMAN_ANCESTOR_FA},conservation_file:${CONSERVATION_FILE},gerp_bigwig:${GERP_BIGWIG} --dir_plugins ${LOFTEE} --cache --dir_cache ${CACHEDIR} --force_overwrite" >> ${c%.vcf.gz}_${count}.sh
-		    echo "${ENSEMBL}/filter_vep -i ${c%.gz}.raw_vep.vcf -o ${c%.gz}.vep.vcf -filter "LoF is HC" --only_matched --force_overwrite" >> ${c%%.vcf.gz}_${count}.sh
-
+                    echo "${VEP} --input_file $c --output_file ${c%.gz}.vep.vcf --vcf --offline --phased --assembly GRCh38 --protein --canonical -plugin LoF,loftee_path:${LOFTEE},human_ancestor_fa:${HUMAN_ANCESTOR_FA},conservation_file:${CONSERVATION_FILE},gerp_bigwig:${GERP_BIGWIG} --dir_plugins ${LOFTEE} --cache --dir_cache ${CACHEDIR} --force_overwrite" >> ${c%.vcf.gz}_${count}.sh
 
 		    echo "gzip $c " >> ${c%.vcf.gz}_${count}.sh
                     echo "gzip ${c%.gz}.vep.vcf " >> ${c%.vcf.gz}_${count}.sh
@@ -283,7 +254,7 @@ else
 ### STEP 2 ###
 
     if [ ${ASSEMBLY} == "GRCh37" ]; then
-            echo "Genes list with high-confidence loss-of-function mutations."
+            echo "Collect genes with high-confidence loss-of-function variants."
 
 #======================================#
 #### Genes containing LoF variants #####
@@ -310,9 +281,9 @@ else
 	    echo "${PERL} ${LOFTK}/gene_lofs_to_gene_lof_counts.pl ${OUTPUTDIR}/${PROJECTNAME}_gene.lof ${OUTPUTDIR}/${PROJECTNAME}_gene.counts" >> ${OUTPUTDIR}/run_vep_to_lof_gene.sh
 	    echo "${PERL} ${LOFTK}/gene_lofs_to_lof_snps.pl ${OUTPUTDIR}/${PROJECTNAME}_gene.lof ${OUTPUTDIR}/${PROJECTNAME}_gene.lof.snps" >> ${OUTPUTDIR}/run_vep_to_lof_gene.sh
 
-#@#	    VEPDEPENDACY=$(squeue -u ${USERNAME} | cat | awk '{print $1}' | tail -n +2 | ${LOFTK}/transpose.pl | sed 's/\t/,/g')
 	    VEPDEPENDACY=$(sacct --format="JobID,JobName%30,State" | awk -v vepann=${VEP_ANNOTATION} '$2 ~ vepann {print $0}' | awk '$3 == "RUNNING" || $3 == "PENDING" {print $1}' | ${LOFTK}/transpose.pl | sed 's/\t/,/g')
-            echo "Job ID: ${VEPDEPENDACY}"
+            echo "Job ID for LoF_gene_${PROJECTNAME}: ${VEPDEPENDACY}"
+
 	    sbatch --job-name=LoF_gene_${PROJECTNAME} --dependency=afterok:${VEPDEPENDACY} -e LoF_gene_${PROJECTNAME}.error -o LoF_gene_${PROJECTNAME}.log -t ${QUEUE_LOF_GENE} --mem=${VMEM_LOF_GENE} --mail-user=${EMAIL} --mail-type=${MAILTYPE} -D ${OUTPUTDIR} ${OUTPUTDIR}/run_vep_to_lof_gene.sh
 
 
@@ -320,7 +291,7 @@ else
 #### LoF variants #####
 #=====================#
 	    echo "#!/bin/bash" > ${OUTPUTDIR}/run_vep_to_lof_snp.sh
-	    echo "sleep 15" >> ${OUTPUTDIR}/run_vep_to_lof_snp.sh
+	    echo "sleep 50" >> ${OUTPUTDIR}/run_vep_to_lof_snp.sh
 	    if [ ${FILE_FORMAT} == "IMPUTE2" ]; then
 		cp ${LOFTK}/vep_vcf_to_snp_lofs.pl ${OUTPUTDIR}
 		echo "${PERL} vep_vcf_to_snp_lofs.pl -v -o ${PROJECTNAME}_snp.lof" >> ${OUTPUTDIR}/run_vep_to_lof_snp.sh
@@ -336,17 +307,18 @@ else
 
 	    echo "${PERL} ${LOFTK}/snp_lofs_to_snp_lof_counts.pl ${OUTPUTDIR}/${PROJECTNAME}_snp.lof ${OUTPUTDIR}/${PROJECTNAME}_snp.counts" >> ${OUTPUTDIR}/run_vep_to_lof_snp.sh
 
-#@#	    VEPDEPENDACY=$(squeue -u ${USERNAME} | cat | awk '{print $1}' | tail -n +2 | ${LOFTK}/transpose.pl | sed 's/\t/,/g')
             VEPDEPENDACY=$(sacct --format="JobID,JobName%30,State" | awk -v vepann=${VEP_ANNOTATION} '$2 ~ vepann {print $0}' | awk '$3 == "RUNNING" || $3 == "PENDING" {print $1}' | ${LOFTK}/transpose.pl | sed 's/\t/,/g')
-	    echo "Job ID: ${VEPDEPENDACY}"
+	    echo "Job ID for LoF_snp_${PROJECTNAME}: ${VEPDEPENDACY}"
+
 	    sbatch --job-name=LoF_snp_${PROJECTNAME} --dependency=afterok:${VEPDEPENDACY} -e LoF_snp_${PROJECTNAME}.error -o LoF_snp_${PROJECTNAME}.log -t ${QUEUE_LOF_SNP} --mem=${VMEM_LOF_SNP} --mail-user=${EMAIL} --mail-type=${MAILTYPE} -D ${OUTPUTDIR} ${OUTPUTDIR}/run_vep_to_lof_snp.sh
 
     elif [ ${ASSEMBLY} == "GRCh38" ]; then
-            echo "Genes list with high-confidence loss-of-function mutations."
+            echo "Collect genes with high-confidence loss-of-function variants."
 
 #======================================#
 #### Genes containing LoF variants #####
 #======================================#
+	    echo "Collect high-confidence loss-of-function variants."
 	    echo "#!/bin/bash" > ${OUTPUTDIR}/run_vep_to_lof_gene.sh
 	    echo "mv ${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF/vcf_chr*/*vep.vcf.gz ${OUTPUTDIR}" >> ${OUTPUTDIR}/run_vep_to_lof_gene.sh
 	    echo "sleep 15" >> ${OUTPUTDIR}/run_vep_to_lof_gene.sh
@@ -368,15 +340,17 @@ else
             echo "${PERL} ${LOFTK}/gene_lofs_to_gene_lof_counts.pl ${OUTPUTDIR}/${PROJECTNAME}_gene.lof ${OUTPUTDIR}/${PROJECTNAME}_gene.counts" >> ${OUTPUTDIR}/run_vep_to_lof_gene.sh
             echo "${PERL} ${LOFTK}/gene_lofs_to_lof_snps.pl ${OUTPUTDIR}/${PROJECTNAME}_gene.lof ${OUTPUTDIR}/${PROJECTNAME}_gene.lof.snps" >> ${OUTPUTDIR}/run_vep_to_lof_gene.sh
 
-#@#	    VEPDEPENDACY=$(squeue -u ${USERNAME} | cat | awk '{print $1}' | tail -n +2 | ${LOFTK}/transpose.pl | sed 's/\t/,/g')
 	    VEPDEPENDACY=$(sacct --format="JobID,JobName%30,State" | awk -v vepann=${VEP_ANNOTATION} '$2 ~ vepann {print $0}' | awk '$3 == "RUNNING" || $3 == "PENDING" {print $1}' | ${LOFTK}/transpose.pl | sed 's/\t/,/g')
-            echo "Job ID: ${VEPDEPENDACY}"
+            echo "Job ID for LoF_gene_${PROJECTNAME}: ${VEPDEPENDACY}"
+
 	    sbatch --job-name=LoF_gene_${PROJECTNAME} --dependency=afterok:${VEPDEPENDACY} -e LoF_gene_${PROJECTNAME}.error -o LoF_gene_${PROJECTNAME}.log -t ${QUEUE_LOF_GENE} --mem=${VMEM_LOF_GENE} --mail-user=${EMAIL} --mail-type=${MAILTYPE} -D ${OUTPUTDIR} ${OUTPUTDIR}/run_vep_to_lof_gene.sh
+
 #=====================#
 #### LoF variants #####
 #=====================#
+	    echo "Collect high-confidence loss-of-function variants."
 	    echo "#!/bin/bash" > ${OUTPUTDIR}/run_vep_to_lof_snp.sh
-	    echo "sleep 15" >> ${OUTPUTDIR}/run_vep_to_lof_snp.sh
+	    echo "sleep 50" >> ${OUTPUTDIR}/run_vep_to_lof_snp.sh
 
 	    if [ ${FILE_FORMAT} == "IMPUTE2" ]; then
 		cp ${LOFTK}/vep_vcf_to_snp_lofs.pl ${OUTPUTDIR}
@@ -393,9 +367,9 @@ else
 
 	    echo "${PERL} ${LOFTK}/snp_lofs_to_snp_lof_counts.pl ${OUTPUTDIR}/${PROJECTNAME}_snp.lof ${OUTPUTDIR}/${PROJECTNAME}_snp.counts" >> ${OUTPUTDIR}/run_vep_to_lof_snp.sh
 
-#@#	    VEPDEPENDACY=$(squeue -u ${USERNAME} | cat | awk '{print $1}' | tail -n +2 | ${LOFTK}/transpose.pl | sed 's/\t/,/g')
 	    VEPDEPENDACY=$(sacct --format="JobID,JobName%30,State" | awk -v vepann=${VEP_ANNOTATION} '$2 ~ vepann {print $0}' | awk '$3 == "RUNNING" || $3 == "PENDING" {print $1}' | ${LOFTK}/transpose.pl | sed 's/\t/,/g')
-            echo "Job ID: ${VEPDEPENDACY}"
+            echo "Job ID for LoF_snp_${PROJECTNAME}: ${VEPDEPENDACY}"
+
 	    sbatch --job-name=LoF_snp_${PROJECTNAME} --dependency=afterok:${VEPDEPENDACY} -e LoF_snp_${PROJECTNAME}.error -o LoF_snp_${PROJECTNAME}.log -t ${QUEUE_LOF_SNP} --mem=${VMEM_LOF_SNP} --mail-user=${EMAIL} --mail-type=${MAILTYPE} -D ${OUTPUTDIR} ${OUTPUTDIR}/run_vep_to_lof_snp.sh
 
     else
@@ -410,58 +384,17 @@ else
 #============================================================================#
 #### Calculate statistics samples,SNPs, transcripts and genes per cohort #####
 #============================================================================#
-    gene_count="${OUTPUTDIR}/${PROJECTNAME}_gene.counts"
-    snp_count="${OUTPUTDIR}/${PROJECTNAME}_snp.counts"
-    while [[ ! -r "${gene_count}" ]] ; do
-      importantnote "Collect genes containing LoF variants from vep.vcf files"
-      sleep 50
-    done
 
-    lof_gene="${OUTPUTDIR}/${PROJECTNAME}_gene.counts"
-    lof_snp="${OUTPUTDIR}/${PROJECTNAME}_snp.counts"
-    SAMPLE_SIZE=$(head -1 ${lof_gene}  | cut -f5- | wc -w)
-    ##
-    onetwo=`cut -f 5- ${lof_gene} | tail -n +2 | awk '$0~/1/ || $0~/2/' | wc -l`
-    one=`cut -f 5- ${lof_gene} | tail -n +2 | awk '$0~/1/' | wc -l `
-    two=`cut -f 5- ${lof_gene} | tail -n +2 | awk '$0~/2/' | wc -l `
-    genehomomin=`cat ${lof_gene} | ${PERL} $LOFTK/transpose.pl | tail -n +8 | cut -f 2- | sed 's/[^2]//g' | awk '{ print length }' | sort -g | head -1`
-    genehomomax=`cat ${lof_gene} | ${PERL} $LOFTK/transpose.pl | tail -n +8 | cut -f 2- | sed 's/[^2]//g' | awk '{ print length }' | sort -gr | head -1`
-    genehetmin=`cat ${lof_gene} | ${PERL} $LOFTK/transpose.pl | tail -n +8 | cut -f 2- | sed 's/[^1]//g' | awk '{ print length }' | sort -g | head -1`
-    genehetmax=`cat ${lof_gene} | ${PERL} $LOFTK/transpose.pl | tail -n +8 | cut -f 2- | sed 's/[^1]//g' | awk '{ print length }' | sort -gr | head -1`
-    median=`cat ${lof_gene} | ${PERL} $LOFTK/transpose.pl | tail -n +8 | cut -f 2- | sed 's/[^12]//g' | awk '{print length }' | sort -g | awk '{count[NR] = $1;} END {if (NR % 2) {print count[(NR + 1) / 2];} else {print (count[(NR / 2)] + count[(NR / 2) + 1]) / 2.0;}}'`
+    LOF_GENE_ANNOTATION="LoF_gene_${PROJECTNAME}"
+    LOF_SNP_ANNOTATION="LoF_snp_${PROJECTNAME}"
+    echo "#!/bin/bash" > ${OUTPUTDIR}/stat_desccription_${PROJECTNAME}.sh
+    DIR_CONFG=$(realpath "$CONFIGURATIONFILE")
+    echo "${LOFTK}/stat_desccription.sh ${DIR_CONFG}" >> ${OUTPUTDIR}/stat_desccription_${PROJECTNAME}.sh
 
-    echo "Cohort ${PROJECTNAME}" > ${OUTPUTDIR}/${PROJECTNAME}_output.info
-    echo "" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
-    echo "LoF genes contain LoF variants" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
-    echo "$one genes contain heterozygous LoF, $two genes contain homozygous LoF, $onetwo as a total of genes contain LoF variant" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
-    echo "$genehetmin - $genehetmax genes with heterozygous LoF variants per sample" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
-    echo "$genehomomin - $genehomomax genes with homozygous LoF variants per sample" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
-    echo "Median of LoF genes per sample is ${median}" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
+    LOFDEPENDACY=$(squeue -u ${USERNAME} -n LoF_gene_${PROJECTNAME},LoF_snp_${PROJECTNAME} | tail -n +2 | awk '{print $1}' | ${LOFTK}/transpose.pl | sed 's/\t/,/g')
 
-    ## LoF variants
-    while [[ ! -r "${snp_count}" ]] ; do
-      importantnote "Collect LoF variants from vep.vcf files"
-      sleep 50
-    done
+    echo "Job ID for STAT_DESC_${PROJECTNAME}: ${LOFDEPENDACY}"
 
-    onetwo=`cut -f 5- ${lof_snp} | tail -n +2 | awk '$0~/1/ || $0~/2/' | wc -l`
-    one=`cut -f 5- ${lof_snp} | tail -n +2 | awk '$0~/1/' | wc -l `
-    two=`cut -f 5- ${lof_snp} | tail -n +2 | awk '$0~/2/' | wc -l `
-    genehomomin=`cat ${lof_snp} | ${PERL} $LOFTK/transpose.pl | tail -n +9 | cut -f 2- | sed 's/[^2]//g' | awk '{ print length }' | sort -g | head -1`
-    genehomomax=`cat ${lof_snp} | ${PERL} $LOFTK/transpose.pl | tail -n +9 | cut -f 2- | sed 's/[^2]//g' | awk '{ print length }' | sort -gr | head -1`
-    genehetmin=`cat ${lof_snp} | ${PERL} $LOFTK/transpose.pl | tail -n +9 | cut -f 2- | sed 's/[^1]//g' | awk '{ print length }' | sort -g | head -1`
-    genehetmax=`cat ${lof_snp} | ${PERL} $LOFTK/transpose.pl | tail -n +9 | cut -f 2- | sed 's/[^1]//g' | awk '{ print length }' | sort -gr | head -1`
-    median=`cat ${lof_snp} | ${PERL} $LOFTK/transpose.pl | tail -n +9 | cut -f 2- | sed 's/[^12]//g' | awk '{print length }' | sort -g | awk '{count[NR] = $1;} END {if (NR % 2) {print count[(NR + 1) / 2];} else {print (count[(NR / 2)] + count[(NR / 2) + 1]) / 2.0;}}'`
-
-    echo "" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
-    echo "LoF variants" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
-    echo "$one heterozygous LoF, $two homozygous LoF, $onetwo total of LoF variant" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
-    echo "$genehetmin - $genehetmax heterozygous LoF variants per sample" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
-    echo "$genehomomin - $genehomomax homozygous LoF variants per sample" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
-    echo "Median of LoF variants per sample is ${median}" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
-
+    sbatch --job-name=STAT_DESC_${PROJECTNAME} --dependency=afterok:${LOFDEPENDACY} -e STAT_DESC_${PROJECTNAME}.error -o STAT_DESC_${PROJECTNAME}.log -t ${QUEUE_STAT_DESC} --mem=${VMEM_STAT_DESC} --mail-user=${EMAIL} --mail-type=${MAILTYPE} -D ${OUTPUTDIR} ${OUTPUTDIR}/stat_desccription_${PROJECTNAME}.sh
 
 fi   # For [$# -lt 1]
-
-
-script_copyright_message

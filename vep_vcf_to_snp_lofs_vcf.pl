@@ -9,7 +9,7 @@ use Getopt::Long;
 use IO::File;
 use IO::Zlib;
 
-my $PROGRAM_NAME       = 'vep_vcf_to_snp_lofs_vcf';
+my $PROGRAM_NAME       = 'vep_vcf_to_snp_lofs';
 my $INVOCATION         = './' . $PROGRAM_NAME . ' -o output.lof';
 my $AUTHOR             = 'Brian Sebastian Cole, PhD & Abdulrahman Alasiri';
 my $VERSION            = 0.03;
@@ -73,7 +73,14 @@ sub parse_info_field {
   my %parsed_info_field;
   @parsed_info_field{ @INFO_FIELDS } = split /$INFO_FIELD_DELIMITER/ , $info_field;
 
-  $parsed_info_field{ 'CSQ' } = parse_consequences( $parsed_info_field{ 'CSQ' } , $CSQ_fields );
+#  $parsed_info_field{ 'MAF' }           =~ s/^MAF=//; #Remove the leading info attribute names.
+#  $parsed_info_field{ 'INFO_SCORE' }    =~ s/^INFO_SCORE=//;
+#  $parsed_info_field{ 'CERTAINTY' }     =~ s/^CERTAINTY=//;
+#  $parsed_info_field{ 'TYPE' }          =~ s/^TYPE=//;
+#  $parsed_info_field{ 'INFO_TYPE0' }    =~ s/^INFO_TYPE0=//;
+#  $parsed_info_field{ 'CONCORD_TYPE0' } =~ s/^CONCORD_TYPE0=//;
+#  $parsed_info_field{ 'R2_TYPE0' }      =~ s/^R2_TYPE0=//;
+  $parsed_info_field{ 'CSQ' } = parse_consequences( $parsed_info_field{ 'CSQ' } , $CSQ_fields ); #Fix the CSQ field.
 
   return \%parsed_info_field;
 }
@@ -158,7 +165,7 @@ sub update_SNP_lofs {
       next unless $transcript->{BIOTYPE} eq "protein_coding"; #Skip transcripts or other features that are not protein-coding according to ENSEMBL.
 
       if ( $transcript->{LoF} and $transcript->{LoF} eq "HC" ) { #High-confidence loss-of-function variant.
-	my $SNP_ID = join "\t" , ( $parsed_line->{id} , $transcript->{Consequence} , $transcript->{Gene} , $transcript->{SYMBOL} ); #E.g. "ENSG000123\tHLA-DRA\tENST01234"
+	my $SNP_ID = join "\t" , ( $parsed_line->{id} , $transcript->{Allele} , $transcript->{Consequence} , $transcript->{Gene} , $transcript->{SYMBOL} ); #E.g. "ENSG000123\tHLA-DRA\tENST01234"
 	my $LoF_string    = $parsed_line->{id} . '_' . $transcript->{Consequence}; #E.g. 'rs1234_stop_gained'.
 
 	my $individual_index = 0; #The index of the individual (human) whose genotype is under consideration.
@@ -204,7 +211,7 @@ sub get_CAF {
       if ( $SNPs->{$SNP}[$sample_index][0] and $SNPs->{$SNP}[$sample_index][0] ne $MISSING_LOF_VALUE ) { #First phase has at least one LoF variant.
 	  if ( $SNPs->{$SNP}[$sample_index][1] and $SNPs->{$SNP}[$sample_index][1] ne $MISSING_LOF_VALUE ) { #Second phase has LoF.
 	      $total_two_copy_LoF++;
-
+	      
 	  }
 	  else {
               $total_single_copy_LoF++; #First phase only: single copy LoF.
@@ -246,7 +253,7 @@ sub write_output_file {
   my ( $SNPs , $sample_names , $output_file ) = @_;
   my $output = IO::File->new( $output_file , 'w' );
 #  $output->print( join "\t" , ( 'SNP_ID' , 'Consequence' , 'gene_ID' , 'gene_symbol' , 'single_copy_LoF_frequency' ,'two_copy_LoF_frequency' , @$sample_names ) ); #Print output header.
-  $output->print( join "\t" , ( 'SNP_ID' , 'Consequence' , 'gene_ID' , 'gene_symbol' , 'heterozygous_LoF_frequency' ,'homozygous_LoF_frequency' , 'heterozygous_LoF_carriers' , 'homozygous_LoF_carriers' , @$sample_names ) ); #Print output header.
+  $output->print( join "\t" , ( 'SNP_ID' , 'Allele' , 'Consequence' , 'gene_ID' , 'gene_symbol' , 'heterozygous_LoF_frequency' ,'homozygous_LoF_frequency' , 'heterozygous_LoF_carriers' , 'homozygous_LoF_carriers' , @$sample_names ) ); #Print output header.
 
   $output->print( "\n" );
 
