@@ -30,9 +30,13 @@ All scripts are annotated for debugging purposes - and future reference. The scr
 - `Perl >= 5.10.1`
 - `Bash`
 - [Ensembl Variant Effect Predictor (VEP)](https://github.com/Ensembl/ensembl-vep)
-- [`LOFTEE`](https://github.com/konradjk/loftee)
+- [`LOFTEE`](https://github.com/konradjk/loftee) for GRCh37
   - Ancestral sequence (human_ancestor.fa[.gz|.rz])
   - PhyloCSF database (phylocsf.sql) for conservation filters
+- [`LOFTEE`](https://github.com/konradjk/loftee/tree/grch38) for GRCh38
+  - GERP scores bigwig (required)
+  - Ancestral sequence
+  - PhyloCSF database
 - [`samtools`](https://github.com/samtools/samtools) (must be on path)
 
 
