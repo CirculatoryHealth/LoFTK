@@ -53,9 +53,9 @@ README.md                         | Description of project           | Human edi
 LICENSE                           | User permissions                 | Read only
 LoF.config                        | Configuration file               | Human editable
 run_loftk.sh                      | Main LoFTK script                | Read only
-LoF_annotation.sh                 | add description here             | Read only
-allele_to_vcf.sh                  | add description here             | Read only
-descriptive_stat.sh               | add description here             | Read only
+LoF_annotation.sh                 | Annotation of LoF variants/genes | Read only
+allele_to_vcf.sh                  | Converting IMPUT2 format to VCF  | Read only
+descriptive_stat.sh               | Descriptive analysis             | Read only
 
 
 #### Changes log
