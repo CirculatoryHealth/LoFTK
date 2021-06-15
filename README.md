@@ -27,13 +27,13 @@ Predicted Loss-of-Function (LoF) variants in human genes are important due to th
 ### Requirements
 All scripts are annotated for debugging purposes - and future reference. The scripts will work within the context of a certain Linux environment - in this case we have tested **LoFTK** on CentOS7 with a SLURM Grid Engine background.
 
-- [Ensembl Variant Effect Predictor (VEP)](https://github.com/Ensembl/ensembl-vep)
 - `Perl >= 5.10.1`
 - `Bash`
+- [Ensembl Variant Effect Predictor (VEP)](https://github.com/Ensembl/ensembl-vep)
 - [`LOFTEE`](https://github.com/konradjk/loftee)
   - Ancestral sequence (human_ancestor.fa[.gz|.rz])
   - PhyloCSF database (phylocsf.sql) for conservation filters
-  - [`samtools`](https://github.com/samtools/samtools) (must be on path)
+- [`samtools`](https://github.com/samtools/samtools) (must be on path)
 
 
 ### Usage
