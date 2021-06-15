@@ -44,22 +44,29 @@ function importantnote {
     echo -e "${CYAN}${1}${NONE}"
 }
 
+script_copyright_message() {
+	echo ""
+	THISYEAR=$(date +'%Y')
+	echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	echo "+ CC-BY-SA-4.0 License                                                                                  +"
+  echo "+ Copyright (c) 2021-${THISYEAR} Abdulrahman Alasiri                                                    +"
+  echo "+                                                                                                       +"
+  echo "+ Copyright (c) 2020 University Medical Center Utrecht                                                  +"
+  echo "+                                                                                                       +"
+  echo "+ Creative Commons Attribution Share Alike 4.0 International                                            +"
+	echo "+                                                                                                       +"                                                                     +"
+	echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+}
+
 script_arguments_error() {
-    echoerror "Number of arguments found "$#"."
-    echoerror ""
-    echoerror "$1" # additional error message
-    echoerror ""
-    echoerror "========================================================================================================="
-    echoerror "                                              OPTION LIST"
-    echoerror ""
-    echoerror " * Argument #1  configuration-file: LoF.config."
-    echoerror ""
-    echoerror " An example command would be: "
-    echoerror "./run_loftk.sh [arg1]"    echoerror ""
-    echoerror "========================================================================================================="
-    # The wrong arguments are passed, so we'll exit the script now!
-    #script_copyright_message
-    exit 1
+	echoerror "$1" # Additional message
+	echoerror "- Argument #1 is path_to/filename of the configuration file."
+	echoerror ""
+	echoerror "An example command would be: run_loftk.sh [arg1]""
+	echoerror "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+ 	echo ""
+	script_copyright_message
+	exit 1
 }
 
 ### START of if-else statement for the number of command-line arguments passed ###
@@ -83,22 +90,23 @@ else
     ### PROJECT SPECIFIC
     ROOTDIR=${ROOTDIR} # the root directory, e.g. /hpc/dhl_ec/aalasiri/lof/Imputation/ukb_5K/Imputation
     PROJECTNAME=${PROJECTNAME} # e.g. "ukb_5K"
-    loftk=${LOFTOOLKIT}
+    LOFTK=${LOFTOOLKIT}
 
-    if [[ ${DATA_TYPE} == "genotype" ]] && [[ ${FILE_FORMAT} == "IMPUTE2" ]]; then 
-	echo "LoFTK will analyze the ${DATA_TYPE} data that exist in ${FILE_FORMAT} files." 
-	${loftk}/allele_to_vcf.sh ${CONFIGURATIONFILE}
-	${loftk}/LoF_annotation.sh ${CONFIGURATIONFILE}
-    elif [[ ${DATA_TYPE} == "genotype" ]] && [[ ${FILE_FORMAT} == "VCF" ]]; then  
+    if [[ ${DATA_TYPE} == "genotype" ]] && [[ ${FILE_FORMAT} == "IMPUTE2" ]]; then
 	echo "LoFTK will analyze the ${DATA_TYPE} data that exist in ${FILE_FORMAT} files."
-	${loftk}/LoF_annotation.sh ${CONFIGURATIONFILE}
+	${LOFTK}/allele_to_vcf.sh ${CONFIGURATIONFILE}
+	${LOFTK}/LoF_annotation.sh ${CONFIGURATIONFILE}
+    elif [[ ${DATA_TYPE} == "genotype" ]] && [[ ${FILE_FORMAT} == "VCF" ]]; then
+	echo "LoFTK will analyze the ${DATA_TYPE} data that exist in ${FILE_FORMAT} files."
+	${LOFTK}/LoF_annotation.sh ${CONFIGURATIONFILE}
     elif [[ ${DATA_TYPE} == "exome" ]] && [[ ${FILE_FORMAT} == "VCF" ]]; then
         echo "LoFTK will analyze the ${DATA_TYPE} data that exist in ${FILE_FORMAT} files."
-	${loftk}/LoF_annotation.sh ${CONFIGURATIONFILE}
-    else 
+	${LOFTK}/LoF_annotation.sh ${CONFIGURATIONFILE}
+    else
 	echo "We only perfomr analysis of genotype and exome data in IMPUTE2 and VCF input files."
 	echo ""
 	echo "Please check DATA_TYPE and FILE_FORMAT in LoF.config file."
     fi
 
 fi
+script_copyright_message

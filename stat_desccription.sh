@@ -45,48 +45,29 @@ function importantnote {
     echo -e "${CYAN}${1}${NONE}"
 }
 
-#script_copyright_message() {
-#    echoitalic ""
-#    THISYEAR=$(date +'%Y')
-#    echoitalic "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-#    echoitalic "+ The MIT License (MIT)                                                                                 +"
-#    echoitalic "+ Copyright (c) 2020-${THISYEAR} Abdulrahman Alasiri                                                        +"
-#    echoitalic "+                                                                                                       +"
-#    echoitalic "+ Permission is hereby granted, free of charge, to any person obtaining a copy of this software and     +"
-#    echoitalic "+ associated documentation files (the \"Software\"), to deal in the Software without restriction,         +"
-#    echoitalic "+ including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, +"
-#    echoitalic "+ and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, +"
-#    echoitalic "+ subject to the following conditions:                                                                  +"
-#    echoitalic "+                                                                                                       +"
-#    echoitalic "+ The above copyright notice and this permission notice shall be included in all copies or substantial  +"
-#    echoitalic "+ portions of the Software.                                                                             +"
-#    echoitalic "+                                                                                                       +"
-#    echoitalic "+ THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT     +"
-#    echoitalic "+ NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND                +"
-#    echoitalic "+ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES  +"
-#    echoitalic "+ OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN   +"
-#    echoitalic "+ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                            +"
-#    echoitalic "+                                                                                                       +"
-#    echoitalic "+ Reference: http://opensource.org.                                                                     +"
-#    echoitalic "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-#}
+script_copyright_message() {
+	echo ""
+	THISYEAR=$(date +'%Y')
+	echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	echo "+ CC-BY-SA-4.0 License                                                                                  +"
+  echo "+ Copyright (c) 2021-${THISYEAR} Abdulrahman Alasiri                                                    +"
+  echo "+                                                                                                       +"
+  echo "+ Copyright (c) 2020 University Medical Center Utrecht                                                  +"
+  echo "+                                                                                                       +"
+  echo "+ Creative Commons Attribution Share Alike 4.0 International                                            +"
+	echo "+                                                                                                       +"                                                                     +"
+	echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+}
 
 script_arguments_error() {
-    echoerror "Number of arguments found "$#"."
-    echoerror ""
-    echoerror "$1" # additional error message
-    echoerror ""
-    echoerror "========================================================================================================="
-    echoerror "                                              OPTION LIST"
-    echoerror ""
-    echoerror " * Argument #1  configuration-file: LoF.config."
-    echoerror ""
-    echoerror " An example command would be: "
-    echoerror "./run_loftk.sh [arg1]"    echoerror ""
-    echoerror "========================================================================================================="
-    # The wrong arguments are passed, so we'll exit the script now!
-    #script_copyright_message
-    #exit 1
+	echoerror "$1" # Additional message
+	echoerror "- Argument #1 is path_to/filename of the configuration file."
+	echoerror ""
+	echoerror "An example command would be: run_loftk.sh [arg1]""
+	echoerror "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+ 	echo ""
+	script_copyright_message
+	exit 1
 }
 
 if [[ $# -lt 1 ]]; then
@@ -95,6 +76,7 @@ if [[ $# -lt 1 ]]; then
     script_arguments_error "You must supply at least [1] argument when running a LoF analysis!"
 
 else
+    TRANSPOSE=${LOFTK}/bin/transpose.pl
 
     ### LOADING CONFIGURATION FILE
     # Loading the configuration file (please refer to the LoFToolKit-Manual for specifications of this file).
@@ -127,13 +109,13 @@ else
     gene_onetwo=`cut -f 8- ${lof_gene} | tail -n +2 | awk '$0~/1/ || $0~/2/' | wc -l`
     gene_one=`cut -f 8- ${lof_gene} | tail -n +2 | awk '$0~/1/' | wc -l `
     gene_two=`cut -f 8- ${lof_gene} | tail -n +2 | awk '$0~/2/' | wc -l `
-    genehomomin=`${PERL} ${LOFTK}/transpose.pl ${lof_gene} | tail -n +8 | cut -f 2- | sed 's/[^2]//g' | awk '{ print length }' | sort -g | head -1`
-    genehomomax=`${PERL} ${LOFTK}/transpose.pl ${lof_gene} | tail -n +8 | cut -f 2- | sed 's/[^2]//g' | awk '{ print length }' | sort -gr | head -1`
-    genehetmin=`${PERL} ${LOFTK}/transpose.pl ${lof_gene} | tail -n +8 | cut -f 2- | sed 's/[^1]//g' | awk '{ print length }' | sort -g | head -1`
-    genehetmax=`${PERL} ${LOFTK}/transpose.pl ${lof_gene} | tail -n +8 | cut -f 2- | sed 's/[^1]//g' | awk '{ print length }' | sort -gr | head -1`
-    gene_median=`${PERL} ${LOFTK}/transpose.pl ${lof_gene} | tail -n +8 | cut -f 2- | sed 's/[^12]//g' | awk '{print length }' | sort -g | awk '{count[NR] = $1;} END {if (NR % 2) {print count[(NR + 1) / 2];}else {print (count[(NR / 2)] + count[(NR / 2) + 1]) / 2.0;}}'`
-    het_gene_median=`${PERL} ${LOFTK}/transpose.pl ${lof_gene} | tail -n +8 | cut -f 2- | sed 's/[^1]//g' | awk '{print length }' | sort -g | awk '{count[NR] = $1;} END {if (NR % 2) {print count[(NR + 1) / 2];}else {print (count[(NR / 2)] + count[(NR / 2) + 1]) / 2.0;}}'`
-    hom_gene_median=`${PERL} ${LOFTK}/transpose.pl ${lof_gene} | tail -n +8 | cut -f 2- | sed 's/[^2]//g' | awk '{print length }' | sort -g | awk '{count[NR] = $1;} END {if (NR % 2) {print count[(NR + 1) / 2];}else {print (count[(NR / 2)] + count[(NR / 2) + 1]) / 2.0;}}'`
+    genehomomin=`${PERL} ${TRANSPOSE} ${lof_gene} | tail -n +8 | cut -f 2- | sed 's/[^2]//g' | awk '{ print length }' | sort -g | head -1`
+    genehomomax=`${PERL} ${TRANSPOSE} ${lof_gene} | tail -n +8 | cut -f 2- | sed 's/[^2]//g' | awk '{ print length }' | sort -gr | head -1`
+    genehetmin=`${PERL} ${TRANSPOSE} ${lof_gene} | tail -n +8 | cut -f 2- | sed 's/[^1]//g' | awk '{ print length }' | sort -g | head -1`
+    genehetmax=`${PERL} ${TRANSPOSE} ${lof_gene} | tail -n +8 | cut -f 2- | sed 's/[^1]//g' | awk '{ print length }' | sort -gr | head -1`
+    gene_median=`${PERL} ${TRANSPOSE} ${lof_gene} | tail -n +8 | cut -f 2- | sed 's/[^12]//g' | awk '{print length }' | sort -g | awk '{count[NR] = $1;} END {if (NR % 2) {print count[(NR + 1) / 2];}else {print (count[(NR / 2)] + count[(NR / 2) + 1]) / 2.0;}}'`
+    het_gene_median=`${PERL} ${TRANSPOSE} ${lof_gene} | tail -n +8 | cut -f 2- | sed 's/[^1]//g' | awk '{print length }' | sort -g | awk '{count[NR] = $1;} END {if (NR % 2) {print count[(NR + 1) / 2];}else {print (count[(NR / 2)] + count[(NR / 2) + 1]) / 2.0;}}'`
+    hom_gene_median=`${PERL} ${TRANSPOSE} ${lof_gene} | tail -n +8 | cut -f 2- | sed 's/[^2]//g' | awk '{print length }' | sort -g | awk '{count[NR] = $1;} END {if (NR % 2) {print count[(NR + 1) / 2];}else {print (count[(NR / 2)] + count[(NR / 2) + 1]) / 2.0;}}'`
 
     echo "Cohort ${PROJECTNAME} \(n=${SAMPLE_SIZE}\)" > ${OUTPUTDIR}/${PROJECTNAME}_output.info
     echo "" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
@@ -163,13 +145,13 @@ else
 	snp_onetwo=`cut -f 10- ${lof_snp} | tail -n +2 | awk '$0~/1/ || $0~/2/' | wc -l`
 	snp_one=`cut -f 10- ${lof_snp} | tail -n +2 | awk '$0~/1/' | wc -l `
 	snp_two=`cut -f 10- ${lof_snp} | tail -n +2 | awk '$0~/2/' | wc -l `
-	snphomomin=`${PERL} ${LOFTK}/transpose.pl ${lof_snp} | tail -n +10 | cut -f 2- | sed 's/[^2]//g' | awk '{ print length }' | sort -g | head -1`
-	snphomomax=`${PERL} ${LOFTK}/transpose.pl ${lof_snp} | tail -n +10 | cut -f 2- | sed 's/[^2]//g' | awk '{ print length }' | sort -gr | head -1`
-	snphetmin=`${PERL} ${LOFTK}/transpose.pl ${lof_snp} | tail -n +10 | cut -f 2- | sed 's/[^1]//g' | awk '{ print length }' | sort -g | head -1`
-	snphetmax=`${PERL} ${LOFTK}/transpose.pl ${lof_snp} | tail -n +10 | cut -f 2- | sed 's/[^1]//g' | awk '{ print length }' | sort -gr | head -1`
-	snp_median=`${PERL} ${LOFTK}/transpose.pl ${lof_snp} | tail -n +10 | cut -f 2- | sed 's/[^12]//g' | awk '{print length }' | sort -g | awk '{count[NR] = $1;} END {if (NR % 2) {print count[(NR + 1) / 2];}else {print (count[(NR / 2)] + count[(NR / 2) + 1]) / 2.0;}}'`
-	het_snp_median=`${PERL} ${LOFTK}/transpose.pl ${lof_snp} | tail -n +10 | cut -f 2- | sed 's/[^1]//g' | awk '{print length }' | sort -g | awk '{count[NR] = $1;} END {if (NR % 2) {print count[(NR + 1) / 2];}else {print (count[(NR / 2)] + count[(NR / 2) + 1]) / 2.0;}}'`
-	homo_snp_median=`${PERL} ${LOFTK}/transpose.pl ${lof_snp} | tail -n +10 | cut -f 2- | sed 's/[^2]//g' | awk '{print length }' | sort -g | awk '{count[NR] = $1;} END {if (NR % 2) {print count[(NR + 1) / 2];}else {print (count[(NR / 2)] + count[(NR / 2) + 1]) / 2.0;}}'`
+	snphomomin=`${PERL} ${TRANSPOSE} ${lof_snp} | tail -n +10 | cut -f 2- | sed 's/[^2]//g' | awk '{ print length }' | sort -g | head -1`
+	snphomomax=`${PERL} ${TRANSPOSE} ${lof_snp} | tail -n +10 | cut -f 2- | sed 's/[^2]//g' | awk '{ print length }' | sort -gr | head -1`
+	snphetmin=`${PERL} ${TRANSPOSE} ${lof_snp} | tail -n +10 | cut -f 2- | sed 's/[^1]//g' | awk '{ print length }' | sort -g | head -1`
+	snphetmax=`${PERL} ${TRANSPOSE} ${lof_snp} | tail -n +10 | cut -f 2- | sed 's/[^1]//g' | awk '{ print length }' | sort -gr | head -1`
+	snp_median=`${PERL} ${TRANSPOSE} ${lof_snp} | tail -n +10 | cut -f 2- | sed 's/[^12]//g' | awk '{print length }' | sort -g | awk '{count[NR] = $1;} END {if (NR % 2) {print count[(NR + 1) / 2];}else {print (count[(NR / 2)] + count[(NR / 2) + 1]) / 2.0;}}'`
+	het_snp_median=`${PERL} ${TRANSPOSE} ${lof_snp} | tail -n +10 | cut -f 2- | sed 's/[^1]//g' | awk '{print length }' | sort -g | awk '{count[NR] = $1;} END {if (NR % 2) {print count[(NR + 1) / 2];}else {print (count[(NR / 2)] + count[(NR / 2) + 1]) / 2.0;}}'`
+	homo_snp_median=`${PERL} ${TRANSPOSE} ${lof_snp} | tail -n +10 | cut -f 2- | sed 's/[^2]//g' | awk '{print length }' | sort -g | awk '{count[NR] = $1;} END {if (NR % 2) {print count[(NR + 1) / 2];}else {print (count[(NR / 2)] + count[(NR / 2) + 1]) / 2.0;}}'`
 
     fi
 

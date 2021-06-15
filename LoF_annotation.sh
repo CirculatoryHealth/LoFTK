@@ -44,48 +44,29 @@ function importantnote {
     echo -e "${CYAN}${1}${NONE}"
 }
 
-#script_copyright_message() {
-#    echoitalic ""
-#    THISYEAR=$(date +'%Y')
-#    echoitalic "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-#    echoitalic "+ The MIT License (MIT)                                                                                 +"
-#    echoitalic "+ Copyright (c) 2020-${THISYEAR} Abdulrahman Alasiri                                                        +"
-#    echoitalic "+                                                                                                       +"
-#    echoitalic "+ Permission is hereby granted, free of charge, to any person obtaining a copy of this software and     +"
-#    echoitalic "+ associated documentation files (the \"Software\"), to deal in the Software without restriction,         +"
-#    echoitalic "+ including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, +"
-#    echoitalic "+ and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, +"
-#    echoitalic "+ subject to the following conditions:                                                                  +"
-#    echoitalic "+                                                                                                       +"
-#    echoitalic "+ The above copyright notice and this permission notice shall be included in all copies or substantial  +"
-#    echoitalic "+ portions of the Software.                                                                             +"
-#    echoitalic "+                                                                                                       +"
-#    echoitalic "+ THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT     +"
-#    echoitalic "+ NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND                +"
-#    echoitalic "+ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES  +"
-#    echoitalic "+ OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN   +"
-#    echoitalic "+ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                            +"
-#    echoitalic "+                                                                                                       +"
-#    echoitalic "+ Reference: http://opensource.org.                                                                     +"
-#    echoitalic "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-#}
+script_copyright_message() {
+	echo ""
+	THISYEAR=$(date +'%Y')
+	echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	echo "+ CC-BY-SA-4.0 License                                                                                  +"
+  echo "+ Copyright (c) 2021-${THISYEAR} Abdulrahman Alasiri                                                    +"
+  echo "+                                                                                                       +"
+  echo "+ Copyright (c) 2020 University Medical Center Utrecht                                                  +"
+  echo "+                                                                                                       +"
+  echo "+ Creative Commons Attribution Share Alike 4.0 International                                            +"
+	echo "+                                                                                                       +"                                                                     +"
+	echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+}
 
 script_arguments_error() {
-    echoerror "Number of arguments found "$#"."
-    echoerror ""
-    echoerror "$1" # additional error message
-    echoerror ""
-    echoerror "========================================================================================================="
-    echoerror "                                              OPTION LIST"
-    echoerror ""
-    echoerror " * Argument #1  configuration-file: LoF.config."
-    echoerror ""
-    echoerror " An example command would be: "
-    echoerror "./run_loftk.sh [arg1]"    echoerror ""
-    echoerror "========================================================================================================="
-    # The wrong arguments are passed, so we'll exit the script now!
-    #script_copyright_message
-    #exit 1
+	echoerror "$1" # Additional message
+	echoerror "- Argument #1 is path_to/filename of the configuration file."
+	echoerror ""
+	echoerror "An example command would be: run_loftk.sh [arg1]""
+	echoerror "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+ 	echo ""
+	script_copyright_message
+	exit 1
 }
 
 ### START of if-else statement for the number of command-line arguments passed ###
@@ -130,6 +111,7 @@ else
     USERNAME=$(whoami)
     PROB2VCF="probs_to_vcf_${PROJECTNAME}"
     VEP_ANNOTATION="VEP_${PROJECTNAME}_"
+    TRANSPOSE=${LOFTK}/bin/transpose.pl
 
     ### Set up directory for VCF files
     if [ ! -d ${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF ]; then
@@ -264,11 +246,11 @@ else
 	    echo "mv ${ROOTDIR}/${PROJECTNAME}_Files_for_VCF_LoF/vcf_chr*/*vep.vcf.gz ${OUTPUTDIR}" >> ${OUTPUTDIR}/run_vep_to_lof_gene.sh
 
 	    if [ ${FILE_FORMAT} == "IMPUTE2" ]; then
-		cp ${LOFTK}/vep_vcf_to_gene_lofs.pl ${OUTPUTDIR}
+		cp ${LOFTK}/src/vep_vcf_to_gene_lofs.pl ${OUTPUTDIR}
 		echo "sleep 15" >> ${OUTPUTDIR}/run_vep_to_lof_gene.sh
 		echo "${PERL} vep_vcf_to_gene_lofs.pl -v -o ${PROJECTNAME}_gene.lof" >> ${OUTPUTDIR}/run_vep_to_lof_gene.sh
 	    elif [ ${FILE_FORMAT} == "VCF" ]; then
-		cp ${LOFTK}/vep_vcf_to_gene_lofs_vcf.pl ${OUTPUTDIR}
+		cp ${LOFTK}/src/vep_vcf_to_gene_lofs_vcf.pl ${OUTPUTDIR}
 		echo "sleep 15" >> ${OUTPUTDIR}/run_vep_to_lof_gene.sh
 		echo "${PERL} vep_vcf_to_gene_lofs_vcf.pl -v -o ${PROJECTNAME}_gene.lof" >> ${OUTPUTDIR}/run_vep_to_lof_gene.sh
 	    else
@@ -278,10 +260,10 @@ else
                 exit 1
             fi
 
-	    echo "${PERL} ${LOFTK}/gene_lofs_to_gene_lof_counts.pl ${OUTPUTDIR}/${PROJECTNAME}_gene.lof ${OUTPUTDIR}/${PROJECTNAME}_gene.counts" >> ${OUTPUTDIR}/run_vep_to_lof_gene.sh
-	    echo "${PERL} ${LOFTK}/gene_lofs_to_lof_snps.pl ${OUTPUTDIR}/${PROJECTNAME}_gene.lof ${OUTPUTDIR}/${PROJECTNAME}_gene.lof.snps" >> ${OUTPUTDIR}/run_vep_to_lof_gene.sh
+	    echo "${PERL} ${LOFTK}/src/gene_lofs_to_gene_lof_counts.pl ${OUTPUTDIR}/${PROJECTNAME}_gene.lof ${OUTPUTDIR}/${PROJECTNAME}_gene.counts" >> ${OUTPUTDIR}/run_vep_to_lof_gene.sh
+	    echo "${PERL} ${LOFTK}/src/gene_lofs_to_lof_snps.pl ${OUTPUTDIR}/${PROJECTNAME}_gene.lof ${OUTPUTDIR}/${PROJECTNAME}_gene.lof.snps" >> ${OUTPUTDIR}/run_vep_to_lof_gene.sh
 
-	    VEPDEPENDACY=$(sacct --format="JobID,JobName%30,State" | awk -v vepann=${VEP_ANNOTATION} '$2 ~ vepann {print $0}' | awk '$3 == "RUNNING" || $3 == "PENDING" {print $1}' | ${LOFTK}/transpose.pl | sed 's/\t/,/g')
+	    VEPDEPENDACY=$(sacct --format="JobID,JobName%30,State" | awk -v vepann=${VEP_ANNOTATION} '$2 ~ vepann {print $0}' | awk '$3 == "RUNNING" || $3 == "PENDING" {print $1}' | ${TRANSPOSE} | sed 's/\t/,/g')
             echo "Job ID for LoF_gene_${PROJECTNAME}: ${VEPDEPENDACY}"
 
 	    sbatch --job-name=LoF_gene_${PROJECTNAME} --dependency=afterok:${VEPDEPENDACY} -e LoF_gene_${PROJECTNAME}.error -o LoF_gene_${PROJECTNAME}.log -t ${QUEUE_LOF_GENE} --mem=${VMEM_LOF_GENE} --mail-user=${EMAIL} --mail-type=${MAILTYPE} -D ${OUTPUTDIR} ${OUTPUTDIR}/run_vep_to_lof_gene.sh
@@ -293,10 +275,10 @@ else
 	    echo "#!/bin/bash" > ${OUTPUTDIR}/run_vep_to_lof_snp.sh
 	    echo "sleep 50" >> ${OUTPUTDIR}/run_vep_to_lof_snp.sh
 	    if [ ${FILE_FORMAT} == "IMPUTE2" ]; then
-		cp ${LOFTK}/vep_vcf_to_snp_lofs.pl ${OUTPUTDIR}
+		cp ${LOFTK}/src/vep_vcf_to_snp_lofs.pl ${OUTPUTDIR}
 		echo "${PERL} vep_vcf_to_snp_lofs.pl -v -o ${PROJECTNAME}_snp.lof" >> ${OUTPUTDIR}/run_vep_to_lof_snp.sh
 	    elif [ ${FILE_FORMAT} == "VCF" ]; then
-                cp ${LOFTK}/vep_vcf_to_snp_lofs_vcf.pl ${OUTPUTDIR}
+                cp ${LOFTK}/src/vep_vcf_to_snp_lofs_vcf.pl ${OUTPUTDIR}
 		echo "${PERL} vep_vcf_to_snp_lofs_vcf.pl -v -o ${PROJECTNAME}_snp.lof" >> ${OUTPUTDIR}/run_vep_to_lof_snp.sh
             else
                 echoerrorflash "                        *** ERROR *** "
@@ -305,9 +287,9 @@ else
                 exit 1
             fi
 
-	    echo "${PERL} ${LOFTK}/snp_lofs_to_snp_lof_counts.pl ${OUTPUTDIR}/${PROJECTNAME}_snp.lof ${OUTPUTDIR}/${PROJECTNAME}_snp.counts" >> ${OUTPUTDIR}/run_vep_to_lof_snp.sh
+	    echo "${PERL} ${LOFTK}/src/snp_lofs_to_snp_lof_counts.pl ${OUTPUTDIR}/${PROJECTNAME}_snp.lof ${OUTPUTDIR}/${PROJECTNAME}_snp.counts" >> ${OUTPUTDIR}/run_vep_to_lof_snp.sh
 
-            VEPDEPENDACY=$(sacct --format="JobID,JobName%30,State" | awk -v vepann=${VEP_ANNOTATION} '$2 ~ vepann {print $0}' | awk '$3 == "RUNNING" || $3 == "PENDING" {print $1}' | ${LOFTK}/transpose.pl | sed 's/\t/,/g')
+            VEPDEPENDACY=$(sacct --format="JobID,JobName%30,State" | awk -v vepann=${VEP_ANNOTATION} '$2 ~ vepann {print $0}' | awk '$3 == "RUNNING" || $3 == "PENDING" {print $1}' | ${TRANSPOSE} | sed 's/\t/,/g')
 	    echo "Job ID for LoF_snp_${PROJECTNAME}: ${VEPDEPENDACY}"
 
 	    sbatch --job-name=LoF_snp_${PROJECTNAME} --dependency=afterok:${VEPDEPENDACY} -e LoF_snp_${PROJECTNAME}.error -o LoF_snp_${PROJECTNAME}.log -t ${QUEUE_LOF_SNP} --mem=${VMEM_LOF_SNP} --mail-user=${EMAIL} --mail-type=${MAILTYPE} -D ${OUTPUTDIR} ${OUTPUTDIR}/run_vep_to_lof_snp.sh
@@ -324,11 +306,11 @@ else
 	    echo "sleep 15" >> ${OUTPUTDIR}/run_vep_to_lof_gene.sh
 
 	    if [ ${FILE_FORMAT} == "IMPUTE2" ]; then
-		cp ${LOFTK}/vep_vcf_to_gene_lofs.pl ${OUTPUTDIR}
+		cp ${LOFTK}/src/vep_vcf_to_gene_lofs.pl ${OUTPUTDIR}
 
                 echo "${PERL} vep_vcf_to_gene_lofs.pl -v -o ${PROJECTNAME}_gene.lof" >> ${OUTPUTDIR}/run_vep_to_lof_gene.sh
             elif [ ${FILE_FORMAT} == "VCF" ]; then
-		cp ${LOFTK}/vep_vcf_to_gene_lofs_vcf.pl ${OUTPUTDIR}
+		cp ${LOFTK}/src/vep_vcf_to_gene_lofs_vcf.pl ${OUTPUTDIR}
                 echo "${PERL} vep_vcf_to_gene_lofs_vcf.pl -v -o ${PROJECTNAME}_gene.lof" >> ${OUTPUTDIR}/run_vep_to_lof_gene.sh
             else
                 echoerrorflash "                        *** ERROR *** "
@@ -337,10 +319,10 @@ else
                 exit 1
             fi
 
-            echo "${PERL} ${LOFTK}/gene_lofs_to_gene_lof_counts.pl ${OUTPUTDIR}/${PROJECTNAME}_gene.lof ${OUTPUTDIR}/${PROJECTNAME}_gene.counts" >> ${OUTPUTDIR}/run_vep_to_lof_gene.sh
-            echo "${PERL} ${LOFTK}/gene_lofs_to_lof_snps.pl ${OUTPUTDIR}/${PROJECTNAME}_gene.lof ${OUTPUTDIR}/${PROJECTNAME}_gene.lof.snps" >> ${OUTPUTDIR}/run_vep_to_lof_gene.sh
+            echo "${PERL} ${LOFTK}/src/gene_lofs_to_gene_lof_counts.pl ${OUTPUTDIR}/${PROJECTNAME}_gene.lof ${OUTPUTDIR}/${PROJECTNAME}_gene.counts" >> ${OUTPUTDIR}/run_vep_to_lof_gene.sh
+            echo "${PERL} ${LOFTK}/src/gene_lofs_to_lof_snps.pl ${OUTPUTDIR}/${PROJECTNAME}_gene.lof ${OUTPUTDIR}/${PROJECTNAME}_gene.lof.snps" >> ${OUTPUTDIR}/run_vep_to_lof_gene.sh
 
-	    VEPDEPENDACY=$(sacct --format="JobID,JobName%30,State" | awk -v vepann=${VEP_ANNOTATION} '$2 ~ vepann {print $0}' | awk '$3 == "RUNNING" || $3 == "PENDING" {print $1}' | ${LOFTK}/transpose.pl | sed 's/\t/,/g')
+	    VEPDEPENDACY=$(sacct --format="JobID,JobName%30,State" | awk -v vepann=${VEP_ANNOTATION} '$2 ~ vepann {print $0}' | awk '$3 == "RUNNING" || $3 == "PENDING" {print $1}' | ${TRANSPOSE} | sed 's/\t/,/g')
             echo "Job ID for LoF_gene_${PROJECTNAME}: ${VEPDEPENDACY}"
 
 	    sbatch --job-name=LoF_gene_${PROJECTNAME} --dependency=afterok:${VEPDEPENDACY} -e LoF_gene_${PROJECTNAME}.error -o LoF_gene_${PROJECTNAME}.log -t ${QUEUE_LOF_GENE} --mem=${VMEM_LOF_GENE} --mail-user=${EMAIL} --mail-type=${MAILTYPE} -D ${OUTPUTDIR} ${OUTPUTDIR}/run_vep_to_lof_gene.sh
@@ -353,10 +335,10 @@ else
 	    echo "sleep 50" >> ${OUTPUTDIR}/run_vep_to_lof_snp.sh
 
 	    if [ ${FILE_FORMAT} == "IMPUTE2" ]; then
-		cp ${LOFTK}/vep_vcf_to_snp_lofs.pl ${OUTPUTDIR}
+		cp ${LOFTK}/src/vep_vcf_to_snp_lofs.pl ${OUTPUTDIR}
                 echo "${PERL} vep_vcf_to_snp_lofs.pl -v -o ${PROJECTNAME}_snp.lof" >> ${OUTPUTDIR}/run_vep_to_lof_snp.sh
             elif [ ${FILE_FORMAT} == "VCF" ]; then
-		cp ${LOFTK}/vep_vcf_to_snp_lofs_vcf.pl ${OUTPUTDIR}
+		cp ${LOFTK}/src/vep_vcf_to_snp_lofs_vcf.pl ${OUTPUTDIR}
                 echo "${PERL} vep_vcf_to_snp_lofs_vcf.pl -v -o ${PROJECTNAME}_snp.lof" >> ${OUTPUTDIR}/run_vep_to_lof_snp.sh
             else
                 echoerrorflash "                        *** ERROR *** "
@@ -365,9 +347,9 @@ else
                 exit 1
             fi
 
-	    echo "${PERL} ${LOFTK}/snp_lofs_to_snp_lof_counts.pl ${OUTPUTDIR}/${PROJECTNAME}_snp.lof ${OUTPUTDIR}/${PROJECTNAME}_snp.counts" >> ${OUTPUTDIR}/run_vep_to_lof_snp.sh
+	    echo "${PERL} ${LOFTK}/src/snp_lofs_to_snp_lof_counts.pl ${OUTPUTDIR}/${PROJECTNAME}_snp.lof ${OUTPUTDIR}/${PROJECTNAME}_snp.counts" >> ${OUTPUTDIR}/run_vep_to_lof_snp.sh
 
-	    VEPDEPENDACY=$(sacct --format="JobID,JobName%30,State" | awk -v vepann=${VEP_ANNOTATION} '$2 ~ vepann {print $0}' | awk '$3 == "RUNNING" || $3 == "PENDING" {print $1}' | ${LOFTK}/transpose.pl | sed 's/\t/,/g')
+	    VEPDEPENDACY=$(sacct --format="JobID,JobName%30,State" | awk -v vepann=${VEP_ANNOTATION} '$2 ~ vepann {print $0}' | awk '$3 == "RUNNING" || $3 == "PENDING" {print $1}' | ${TRANSPOSE} | sed 's/\t/,/g')
             echo "Job ID for LoF_snp_${PROJECTNAME}: ${VEPDEPENDACY}"
 
 	    sbatch --job-name=LoF_snp_${PROJECTNAME} --dependency=afterok:${VEPDEPENDACY} -e LoF_snp_${PROJECTNAME}.error -o LoF_snp_${PROJECTNAME}.log -t ${QUEUE_LOF_SNP} --mem=${VMEM_LOF_SNP} --mail-user=${EMAIL} --mail-type=${MAILTYPE} -D ${OUTPUTDIR} ${OUTPUTDIR}/run_vep_to_lof_snp.sh
@@ -391,7 +373,7 @@ else
     DIR_CONFG=$(realpath "$CONFIGURATIONFILE")
     echo "${LOFTK}/stat_desccription.sh ${DIR_CONFG}" >> ${OUTPUTDIR}/stat_desccription_${PROJECTNAME}.sh
 
-    LOFDEPENDACY=$(squeue -u ${USERNAME} -n LoF_gene_${PROJECTNAME},LoF_snp_${PROJECTNAME} | tail -n +2 | awk '{print $1}' | ${LOFTK}/transpose.pl | sed 's/\t/,/g')
+    LOFDEPENDACY=$(squeue -u ${USERNAME} -n LoF_gene_${PROJECTNAME},LoF_snp_${PROJECTNAME} | tail -n +2 | awk '{print $1}' | ${TRANSPOSE} | sed 's/\t/,/g')
 
     echo "Job ID for STAT_DESC_${PROJECTNAME}: ${LOFDEPENDACY}"
 

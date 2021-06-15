@@ -22,58 +22,65 @@ WHITE='\033[01;37m'
 function echobold { #'echobold' is the function name
     echo -e "${BOLD}${1}${NONE}" # this is whatever the function needs to execute, note ${1} is the text for echo
 }
-function echoitalic { 
-    echo -e "${ITALIC}${1}${NONE}" 
+function echoitalic {
+    echo -e "${ITALIC}${1}${NONE}"
 }
-function echonooption { 
+function echonooption {
     echo -e "${OPAQUE}${RED}${1}${NONE}"
 }
-function echoerrorflash { 
-    echo -e "${RED}${BOLD}${FLASHING}${1}${NONE}" 
+function echoerrorflash {
+    echo -e "${RED}${BOLD}${FLASHING}${1}${NONE}"
 }
-function echoerror { 
+function echoerror {
     echo -e "${RED}${1}${NONE}"
 }
 # errors no option
-function echoerrornooption { 
+function echoerrornooption {
     echo -e "${YELLOW}${1}${NONE}"
 }
-function echoerrorflashnooption { 
+function echoerrorflashnooption {
     echo -e "${YELLOW}${BOLD}${FLASHING}${1}${NONE}"
 }
-function importantnote { 
+function importantnote {
     echo -e "${CYAN}${1}${NONE}"
 }
 
+script_copyright_message() {
+	echo ""
+	THISYEAR=$(date +'%Y')
+	echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+	echo "+ CC-BY-SA-4.0 License                                                                                  +"
+  echo "+ Copyright (c) 2021-${THISYEAR} Abdulrahman Alasiri                                                    +"
+  echo "+                                                                                                       +"
+  echo "+ Copyright (c) 2020 University Medical Center Utrecht                                                  +"
+  echo "+                                                                                                       +"
+  echo "+ Creative Commons Attribution Share Alike 4.0 International                                            +"
+	echo "+                                                                                                       +"                                                                     +"
+	echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+}
+
 script_arguments_error() {
-    echoerror "Number of arguments found "$#"."
-    echoerror ""
-    echoerror "$1" # additional error message
-    echoerror ""
-    echoerror "========================================================================================================="
-    echoerror "                                              OPTION LIST"
-    echoerror ""
-    echoerror " * Argument #1  configuration-file: LoF.config."
-    echoerror ""
-    echoerror " An example command would be: "
-    echoerror "./run_loftk.sh [arg1]"    echoerror ""
-    echoerror "========================================================================================================="
-    # The wrong arguments are passed, so we'll exit the script now!
-    #script_copyright_message
-    exit 1
+	echoerror "$1" # Additional message
+	echoerror "- Argument #1 is path_to/filename of the configuration file."
+	echoerror ""
+	echoerror "An example command would be: run_loftk.sh [arg1]""
+	echoerror "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+ 	echo ""
+	script_copyright_message
+	exit 1
 }
 
 ### START of if-else statement for the number of command-line arguments passed ###
-if [[ $# -lt 1 ]]; then 
+if [[ $# -lt 1 ]]; then
     echoerrorflash "                                     *** Oh no! Computer says no! ***"
     echo ""
     script_arguments_error "You must supply at least [1] argument when running a LoF analysis!"
 
 else
     ### LOADING CONFIGURATION FILE
-    # Loading the configuration file (please refer to the LoFToolKit-Manual for specifications of this file). 
+    # Loading the configuration file (please refer to the LoFToolKit-Manual for specifications of this file).
     source "$1" # Depends on arg1.
-    
+
     ### REQUIRED | GENERALS
     CONFIGURATIONFILE="$1" # Depends on arg1 -- but also on where it resides!!!
 
@@ -83,12 +90,13 @@ else
     ### MAIL SETTINGS
     EMAIL=${YOUREMAIL}
     MAILTYPE=${MAILSETTINGS}
-    ### PROJECT SPECIFIC 
+    ### PROJECT SPECIFIC
     ROOTDIR=${ROOTDIR} # the root directory, e.g. /hpc/dhl_ec/aalasiri/projects/test_lof
     PROJECTNAME=${PROJECTNAME} # e.g. "ukb"
     LOFTK=${LOFTOOLKIT}
+    CHR_WIND=$LOFTK/bin/chromosome_windows.txt
 
-    ### PROJECT SPECIFIC 
+    ### PROJECT SPECIFIC
     ROOTDIR=${ROOTDIR} # the root directory, e.g. /hpc/dhl_ec/svanderlaan/projects/test_lof
     PROJECTNAME=${PROJECTNAME} # e.g. "WES_ukb_5K"
     INFO=${INFO}
@@ -125,15 +133,15 @@ else
 	elif [ "$(ls -A ${PROJECTDIR}/vcf_chr"$chr")" ]; then
 	    echoerrorflash "The ${PROJECTDIR}/vcf_chr"$chr" directory already exists; Mr. Bourne will make it empity for you."
 	    rm ${PROJECTDIR}/vcf_chr"$chr"/*
-	else 
+	else
 	    echo "The ${PROJECTDIR}/vcf_chr"$chr" directory already exists and empity."
 	fi
         cp ${ROOTDIR}/*_GoNL_1KG_chr"$chr"\:*info ${PROJECTDIR}/vcf_chr"$chr"
 	cp ${ROOTDIR}/*_GoNL_1KG_chr"$chr"\:*sample* ${PROJECTDIR}/vcf_chr"$chr"
 
 ### The full Mb span of the chromosome
-        start=$( awk ' $1=="'$chr'" { print $2 } ' $LOFTK/chromosome_windows.txt )
-        stop=$( awk ' $1=="'$chr'" { print $3 } ' $LOFTK/chromosome_windows.txt )
+        start=$( awk ' $1=="'$chr'" { print $2 } ' ${CHR_WIND} )
+        stop=$( awk ' $1=="'$chr'" { print $3 } ' ${CHR_WIND} )
         while [ $start -le $stop ]
         do
 
@@ -151,7 +159,7 @@ else
             sort -gk3 ${PROJECTDIR}/vcf_chr"$chr"/${PROJECTNAME}_GoNL_1KG_chr"$chr":"$lower"-"$upper"Mb_allele_probs  > ${PROJECTDIR}/vcf_chr"$chr"/${PROJECTNAME}_GoNL_1KG_chr"$chr":"$lower"-"$upper"Mb_allele_probs.sorted
             mv ${PROJECTDIR}/vcf_chr"$chr"/${PROJECTNAME}_GoNL_1KG_chr"$chr":"$lower"-"$upper"Mb_allele_probs.sorted ${PROJECTDIR}/vcf_chr"$chr"/${PROJECTNAME}_GoNL_1KG_chr"$chr":"$lower"-"$upper"Mb_allele_probs
             echo "gzip final file"
-            gzip ${PROJECTDIR}/vcf_chr"$chr"/${PROJECTNAME}_GoNL_1KG_chr"$chr":"$lower"-"$upper"Mb_allele_probs 
+            gzip ${PROJECTDIR}/vcf_chr"$chr"/${PROJECTNAME}_GoNL_1KG_chr"$chr":"$lower"-"$upper"Mb_allele_probs
 
             (( start += 5 ))
         done
@@ -162,8 +170,8 @@ else
 #### Convert imputation probs files to VCF files  #####
 #=====================================================#
 ### Run allele_probs_to_vcf in all folders
-        cp ${LOFTK}/allele_probs_to_vcfs.pl ${PROJECTDIR}/vcf_chr"$chr"/
-	echo "#!/bin/bash" > ${PROJECTDIR}/vcf_chr"$chr"/run_allele_probs_to_vcf_${PROJECTNAME}_chr"$chr".sh
+        cp ${LOFTK}/src/allele_probs_to_vcfs.pl ${PROJECTDIR}/vcf_chr"$chr"/
+	      echo "#!/bin/bash" > ${PROJECTDIR}/vcf_chr"$chr"/run_allele_probs_to_vcf_${PROJECTNAME}_chr"$chr".sh
 
         echo "perl allele_probs_to_vcfs.pl -i ${INFO} -p ${PROB} -v" >> ${PROJECTDIR}/vcf_chr"$chr"/run_allele_probs_to_vcf_${PROJECTNAME}_chr"$chr".sh
         echo "gzip *.vcf" >> ${PROJECTDIR}/vcf_chr"$chr"/run_allele_probs_to_vcf_${PROJECTNAME}_chr"$chr".sh
@@ -171,14 +179,14 @@ else
 	sbatch --job-name=probs_to_vcf_${PROJECTNAME}_chr"$chr" -e allele_probs_to_vcf_${PROJECTNAME}_chr"$chr".errors -o allele_probs_to_vcf_${PROJECTNAME}_chr"$chr".log -t ${QUEUE_PROB2VCF} --mem=${VMEM_PROB2VCF} --mail-user=${EMAIL} --mail-type=${MAILTYPE} -D ${PROJECTDIR}/vcf_chr"$chr" ${PROJECTDIR}/vcf_chr"$chr"/run_allele_probs_to_vcf_${PROJECTNAME}_chr"$chr".sh
 
         sleep 1
-	
+
     done
-    
+
     for chr in ${CHROMOSOMES}
     do
 	PROB2VCF=probs_to_vcf_${PROJECTNAME}
 	PROBRUN=$(sacct --format="JobID,JobName%30,State" | awk -v prob=${PROB2VCF} '$2 ~ prob {print $0}' | awk '$3 == "RUNNING" || $3 == "PENDING" {print $1}' | awk 'END{ print NR }')
-#	if [[ $PROBRUN -ne 0 ]]; then 
+#	if [[ $PROBRUN -ne 0 ]]; then
 	echo "Chromosome ${chr}"
 	prob_files=`ls -1 ${PROJECTDIR}/vcf_chr"$chr"/*allele_probs.gz 2>/dev/null | wc -l`
 	vcf_files=`ls -1 ${PROJECTDIR}/vcf_chr"$chr"/*vcf.gz 2>/dev/null | wc -l`
