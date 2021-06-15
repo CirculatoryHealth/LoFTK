@@ -30,9 +30,9 @@ All scripts are annotated for debugging purposes - and future reference. The scr
 - `Perl >= 5.10.1`
 - `Bash`
 - [`LOFTEE`](https://github.com/konradjk/loftee)
--- Ancestral sequence (human_ancestor.fa[.gz|.rz])
--- PhyloCSF database (phylocsf.sql) for conservation filters
--- [`samtools`](https://github.com/samtools/samtools) (must be on path)
+  - Ancestral sequence (human_ancestor.fa[.gz|.rz])
+  - PhyloCSF database (phylocsf.sql) for conservation filters
+  - [`samtools`](https://github.com/samtools/samtools) (must be on path)
 
 
 ### Usage
