@@ -1,6 +1,6 @@
 LOFTK (Loss-of-Function ToolKit)
 ============
-
+[![License](https://choosealicense.com/licenses/cc-by-sa-4.0/#)
 [![DOI]()]()
 
 #### This readme
