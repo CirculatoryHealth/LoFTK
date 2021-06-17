@@ -49,12 +49,12 @@ script_copyright_message() {
 	THISYEAR=$(date +'%Y')
 	echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 	echo "+ CC-BY-SA-4.0 License                                                                                  +"
-  echo "+ Copyright (c) 2021-${THISYEAR} Abdulrahman Alasiri                                                    +"
-  echo "+                                                                                                       +"
-  echo "+ Copyright (c) 2020 University Medical Center Utrecht                                                  +"
-  echo "+                                                                                                       +"
-  echo "+ Creative Commons Attribution Share Alike 4.0 International                                            +"
-	echo "+                                                                                                       +"                                                                     +"
+	echo "+ Copyright (c) 2021-${THISYEAR} Abdulrahman Alasiri                                                           +"
+	echo "+                                                                                                       +"
+	echo "+ Copyright (c) 2020 University Medical Center Utrecht                                                  +"
+	echo "+                                                                                                       +"
+	echo "+ Creative Commons Attribution Share Alike 4.0 International                                            +"
+	echo "+                                                                                                       +" 
 	echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 }
 
@@ -62,12 +62,29 @@ script_arguments_error() {
 	echoerror "$1" # Additional message
 	echoerror "- Argument #1 is path_to/filename of the configuration file."
 	echoerror ""
-	echoerror "An example command would be: run_loftk.sh [arg1]""
+	echoerror "An example command would be: run_loftk.sh [arg1]"
 	echoerror "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
  	echo ""
 	script_copyright_message
 	exit 1
 }
+
+echobold "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+echobold "+                                       LOFTK (Loss-of-Function ToolKit)                                +"
+echobold "+                                                                                                       +"
+echobold "+                                                                                                       +"
+echobold "+ * Written by  : Abdulrahman Alasiri                                                                   +"
+echobold "+ * E-mail      : a.i.alasiri@umcutrecht.nl                                                             +"
+echobold "+ * Last update : 2021-06-17                                                                            +"
+echobold "+ * Version     : 1.0.0                                                                                 +"
+echobold "+                                                                                                       +"
+echobold "+ * Description : This script will set some directories, and execute LoF analysis                       +"
+echobold "+                 according to your specifications and using  your genotypes or sequencing data.        +"
+echobold "+                                                                                                       +"
+echobold "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+echo "Today's date and time: "$(date)
+TODAY=$(date +"%Y%m%d")
+echo ""
 
 ### START of if-else statement for the number of command-line arguments passed ###
 if [[ $# -lt 1 ]]; then
