@@ -77,6 +77,8 @@ descriptive_stat.sh               | Descriptive analysis             | Read only
   2. IMPUTE2 output format.
     - Four files with the following extensions are needed as an input; `.haps.gz`, `.allele_probs.gz`, `.info` and `.sample`
 
+:warning: The input data have to be phased to annotate compound hetorozygous LoF variants, which result in LoF genes with two copies losses.
+
 For more details and [examples] about [**input files**](https://github.com/CirculatoryHealth/LoFTK/wiki/Input-files) are explained in the [wiki](https://github.com/CirculatoryHealth/LoFTK/wiki).
 
 
