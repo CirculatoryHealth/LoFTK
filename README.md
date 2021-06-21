@@ -41,7 +41,7 @@ All scripts are annotated for debugging purposes - and future reference. The scr
 
 
 ### Usage
-The only script the user should use is the `run_loftk.sh` script in conjunction with a configuration file `LoF.config`.
+The only script the user should use is the `run_loftk.sh` script in conjunction with a configuration file `LoF.config`. It is required to set up the configuration file `LoF.config` before run any analysis, follow the [instruction](https://github.com/CirculatoryHealth/LoFTK/wiki/Configuration) in the [wiki](https://github.com/CirculatoryHealth/LoFTK/wiki).
 
 You can run **LoFTK** using the following command:
 
