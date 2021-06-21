@@ -24,9 +24,9 @@ Predicted Loss-of-Function (LoF) variants in human genes are important due to th
 
 ## Installation and Requirements
 
-### Install LoFTK 
+### Install LoFTK
 LoFTK has been developed to work under the environment of two cluster managers; Simple Linux Utility for Resource Management (SLURM) and Sun Grid Engine (SGE). Each cluster manager (SLURM/SGE) has LoFTK verison for installation. Look at [Instillation and Requirements](https://github.com/CirculatoryHealth/LoFTK/wiki/Instillation-and-Requirements) in the [wiki](https://github.com/CirculatoryHealth/LoFTK/wiki).
- 
+
 
 ### Requirements
 All scripts are annotated for debugging purposes - and future reference. The scripts will work within the context of a certain Linux environment - in this case we have tested **LoFTK** on CentOS7 with a SLURM Grid Engine background.
@@ -72,13 +72,15 @@ descriptive_stat.sh               | Descriptive analysis             | Read only
 
 ### Input data
 **LoFTK** permits two common file formats as an input:
-  1. Variant Call Format (VCF). 
+  1. Variant Call Format (VCF).
+    - You can find VCF specification [here](https://samtools.github.io/hts-specs/VCFv4.2.pdf).
   2. IMPUTE2 output format.
+    - Four files with the following extensions are needed as an input; [ `.haps.gz`, `.allele_probs.gz`, `.info` and `.sample`
 
-For more details and examples about [input files] are explained in [wiki]((https://github.com/CirculatoryHealth/LoFTK/wiki). 
+For more details and examples about [**input files**](https://github.com/CirculatoryHealth/LoFTK/wiki/Input-files) are explained in the [wiki](https://github.com/CirculatoryHealth/LoFTK/wiki). 
 
 
-### Outputs 
+### Outputs
 
 
 
