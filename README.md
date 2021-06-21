@@ -75,13 +75,16 @@ descriptive_stat.sh               | Descriptive analysis             | Read only
   1. Variant Call Format (VCF).
     - You can find VCF specification [here](https://samtools.github.io/hts-specs/VCFv4.2.pdf).
   2. IMPUTE2 output format.
-    - Four files with the following extensions are needed as an input; [ `.haps.gz`, `.allele_probs.gz`, `.info` and `.sample`
+    - Four files with the following extensions are needed as an input; `.haps.gz`, `.allele_probs.gz`, `.info` and `.sample`
 
-For more details and examples about [**input files**](https://github.com/CirculatoryHealth/LoFTK/wiki/Input-files) are explained in the [wiki](https://github.com/CirculatoryHealth/LoFTK/wiki). 
+For more details and [examples] about [**input files**](https://github.com/CirculatoryHealth/LoFTK/wiki/Input-files) are explained in the [wiki](https://github.com/CirculatoryHealth/LoFTK/wiki).
 
 
 ### Outputs
+**LoFTK** works in parallel to predict LoF *variants* (heterozygote and homozygote) and *genes*  (1-copy and 2-copy losses).
 
+
+[image]
 
 
 
