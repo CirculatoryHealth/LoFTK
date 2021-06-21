@@ -43,6 +43,7 @@ All scripts are annotated for debugging purposes - and future reference. The scr
   - PhyloCSF database
 - [`samtools`](https://github.com/samtools/samtools) (must be on path)
 
+--------------
 
 ### Usage
 The only script the user should use is the `run_loftk.sh` script in conjunction with a configuration file `LoF.config`. It is required to set up the configuration file `LoF.config` before run any analysis, follow the [instruction](https://github.com/CirculatoryHealth/LoFTK/wiki/Configuration) in the [wiki](https://github.com/CirculatoryHealth/LoFTK/wiki).
@@ -66,6 +67,8 @@ run_loftk.sh                      | Main LoFTK script                | Read only
 LoF_annotation.sh                 | Annotation of LoF variants/genes | Read only
 allele_to_vcf.sh                  | Converting IMPUT2 format to VCF  | Read only
 descriptive_stat.sh               | Descriptive analysis             | Read only
+
+--------------
 
 ### Input data
 **LoFTK** permits two common file formats as an input:
