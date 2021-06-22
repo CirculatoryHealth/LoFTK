@@ -83,7 +83,7 @@ For more details and [examples] about [**input files**](https://github.com/Circu
 
 
 ### Outputs
-**LoFTK** will generate four files as an output for the analysis
+**LoFTK** will generate four files as an output at the end of the analysis. The [LoFTK outputs](https://github.com/CirculatoryHealth/LoFTK/wiki/LoFTK-outputs) in the [wiki](https://github.com/CirculatoryHealth/LoFTK/wiki) contains more explanation. 
 
   1. [[project_name]_snp.counts](https://github.com/CirculatoryHealth/LoFTK/wiki/LoFTK-outputs): LoF variants and individuals.
   2. [[project_name]_gene.counts](https://github.com/CirculatoryHealth/LoFTK/wiki/LoFTK-outputs): LoF genes and individuals.
