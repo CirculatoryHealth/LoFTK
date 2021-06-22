@@ -38,9 +38,9 @@ All scripts are annotated for debugging purposes - and future reference. The scr
   - Ancestral sequence [`(human_ancestor.fa[.gz|.rz])`](https://github.com/konradjk/loftee#:~:text=slow%29.%20Default%3A%20fast.-,human_ancestor_fa,-Location%20of%20human_ancestor)
   - PhyloCSF database [`(phylocsf.sql)`](https://github.com/konradjk/loftee#:~:text=checked%20and%20filtered.-,conservation_file,-The%20required%20SQL) for conservation filters
 - [`LOFTEE`](https://github.com/konradjk/loftee/tree/grch38) for GRCh38
-  - GERP scores bigwig [`gerp_bigwig`](https://github.com/konradjk/loftee/tree/grch38#:~:text=contain%20this%20path.-,gerp_bigwig,-Location%20of%20GERP)
-  - Ancestral sequence [`human_ancestor_fa`](https://github.com/konradjk/loftee/tree/grch38#:~:text=download%20for%20GRCh38.-,human_ancestor_fa,-Location%20of%20human_ancestor)
-  - PhyloCSF database [`loftee.sql.gz`](https://github.com/konradjk/loftee/tree/grch38#:~:text=checked%20and%20filtered.-,conservation_file,-Location%20of%20file)
+  - GERP scores bigwig [`(gerp_bigwig)`](https://github.com/konradjk/loftee/tree/grch38#:~:text=contain%20this%20path.-,gerp_bigwig,-Location%20of%20GERP)
+  - Ancestral sequence [`(human_ancestor_fa)`](https://github.com/konradjk/loftee/tree/grch38#:~:text=download%20for%20GRCh38.-,human_ancestor_fa,-Location%20of%20human_ancestor)
+  - PhyloCSF database [`(loftee.sql.gz)`](https://github.com/konradjk/loftee/tree/grch38#:~:text=checked%20and%20filtered.-,conservation_file,-Location%20of%20file)
 - [`samtools`](https://github.com/samtools/samtools) (must be on path)
 
 --------------
@@ -73,13 +73,15 @@ descriptive_stat.sh               | Descriptive analysis             | Read only
 ## Inputs
 **LoFTK** permits two common file formats as an input:
   1. Variant Call Format (VCF).
+
     - You can find VCF specification [here](https://samtools.github.io/hts-specs/VCFv4.2.pdf).
+
   2. IMPUTE2 output format.
     - Four files with the following extensions are needed as an input; `.haps.gz`, `.allele_probs.gz`, `.info` and `.sample`
 
 :warning: The input data have to be phased to annotate compound hetorozygous LoF variants, which result in LoF genes with two copies losses.
 
-For more details and [examples] about [**input files**](https://github.com/CirculatoryHealth/LoFTK/wiki/Input-files) are explained in the [wiki](https://github.com/CirculatoryHealth/LoFTK/wiki).
+For more details and [examples](data/) about [**input files**](https://github.com/CirculatoryHealth/LoFTK/wiki/Input-files) are explained in the [wiki](https://github.com/CirculatoryHealth/LoFTK/wiki).
 
 --------------
 
