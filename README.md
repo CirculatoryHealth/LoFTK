@@ -87,7 +87,7 @@ For more details and [examples] about [**input files**](https://github.com/Circu
 
 Output files                      | Description                       
 --------------------------------- | --------------------------------
-[project_name]_snp.lof            | The rows are variants and the genotype entries are phased lists of high-confidence loss-of-function mutations.        
+[project_name]_snp.lof            | The rows are variants and columns shows `SNP_ID` `Allele` `Consequence` `gene_ID` `gene_symbol` `heterozygous_LoF_frequency` `homozygous_LoF_frequency` `heterozygous_LoF_carriers` `homozygous_LoF_carriers` the genotype entries are phased lists of high-confidence loss-of-function mutations.        
 [project_name]_snp.counts         | User permissions                 
 [project_name]_gene.lof           | Configuration file               
 [project_name]_gene.counts        | Main LoFTK script                

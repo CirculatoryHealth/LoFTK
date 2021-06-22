@@ -5,7 +5,7 @@ use strict;
 use autodie;
 
 #gene_lofs_to_gene_lof_counts
-#Copyright Brian S. Cole, PhD 2015, 2016, Abdulrahman Alasiri, 2020
+#Copyright Brian S. Cole, PhD 2015, 2016; Abdulrahman Alasiri, 2020
 #Given a *.gene_lofs file with the phased LoF strings reported by vep_vcf_to_gene_lofs, replace the LoF strings with LoF count.
 
 sub lof_string_to_lof_count {
