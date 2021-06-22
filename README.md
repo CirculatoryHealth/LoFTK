@@ -73,10 +73,10 @@ descriptive_stat.sh               | Descriptive analysis             | Read only
 ## Inputs
 **LoFTK** permits two common file formats as an input:
   1. **Variant Call Format (VCF)**
-    You can find VCF specification [here](https://samtools.github.io/hts-specs/VCFv4.2.pdf).
 
-  2. **IMPUTE2 output format**
-    Four files with the following extensions are needed as an input; `.haps.gz`, `.allele_probs.gz`, `.info` and `.sample`
+  You can find VCF specification [here](https://samtools.github.io/hts-specs/VCFv4.2.pdf).
+
+  2. **IMPUTE2 output format**: Four files with the following extensions are needed as an input; `.haps.gz`, `.allele_probs.gz`, `.info` and `.sample`
 
 :warning: The input data have to be phased to annotate compound hetorozygous LoF variants, which result in LoF genes with two copies losses.
 
