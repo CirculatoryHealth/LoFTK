@@ -70,7 +70,7 @@ descriptive_stat.sh               | Descriptive analysis             | Read only
 
 --------------
 
-### Input data
+### Inputs
 **LoFTK** permits two common file formats as an input:
   1. Variant Call Format (VCF).
     - You can find VCF specification [here](https://samtools.github.io/hts-specs/VCFv4.2.pdf).
@@ -83,7 +83,7 @@ For more details and [examples] about [**input files**](https://github.com/Circu
 
 
 ### Outputs
-**LoFTK** will generate four files as an output at the end of the analysis. The [LoFTK outputs](https://github.com/CirculatoryHealth/LoFTK/wiki/LoFTK-outputs) in the [wiki](https://github.com/CirculatoryHealth/LoFTK/wiki) contains more explanation. 
+**LoFTK** will generate four files as an output at the end of the analysis. The [LoFTK outputs](https://github.com/CirculatoryHealth/LoFTK/wiki/LoFTK-outputs) in the [wiki](https://github.com/CirculatoryHealth/LoFTK/wiki) contains more explanation.
 
   1. [[project_name]_snp.counts](https://github.com/CirculatoryHealth/LoFTK/wiki/LoFTK-outputs): LoF variants and individuals.
   2. [[project_name]_gene.counts](https://github.com/CirculatoryHealth/LoFTK/wiki/LoFTK-outputs): LoF genes and individuals.
@@ -108,6 +108,11 @@ Jessica van Setten, PhD | j.vansetten [at] umcutrecht.nl
 --------------
 
 #### CC-BY-SA-4.0 License
+
+<table>
+<tr>
+<td>
+
 ##### Copyright (c) 2020 University Medical Center Utrecht
 
 Creative Commons Attribution-ShareAlike 4.0 International Public License
@@ -119,3 +124,7 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 Reference: https://choosealicense.com/licenses/cc-by-sa-4.0/#.
+
+</td>
+</tr>
+</table>
