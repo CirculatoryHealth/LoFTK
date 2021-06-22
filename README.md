@@ -85,10 +85,10 @@ For more details and [examples] about [**input files**](https://github.com/Circu
 ### Outputs
 **LoFTK** will generate four files as an output for the analysis
 
-  1. [[project_name]_snp.counts].
-  2. [[project_name]_gene.counts].
-  3. [project_name]_gene.lof.snps.
-  4. [project_name]_output.info
+  1. [[project_name]_snp.counts](https://github.com/CirculatoryHealth/LoFTK/wiki/LoFTK-outputs): LoF variants and individuals.
+  2. [[project_name]_gene.counts](https://github.com/CirculatoryHealth/LoFTK/wiki/LoFTK-outputs): LoF genes and individuals.
+  3. [[project_name]_gene.lof.snps](https://github.com/CirculatoryHealth/LoFTK/wiki/LoFTK-outputs): list of LoF variants allele frequencies.
+  4. [[project_name]_output.info](https://github.com/CirculatoryHealth/LoFTK/wiki/LoFTK-outputs): report descriptive statistics on LoF variants and genes.
 
 
 --------------
