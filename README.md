@@ -17,7 +17,7 @@ Predicted Loss-of-Function (LoF) variants in human genes are important due to th
 
 
 **The Loss-of-Function ToolKit Workflow: finding knockouts using genotyped and sequenced genomes.**
-![The Loss-of-Function ToolKit Workflow: finding knockouts using genotyped and sequenced genomes.](images/workflow.png)
+![The Loss-of-Function ToolKit Workflow: finding knockouts using genotyped and sequenced genomes.](docs/images/workflow.png)
 
 
 --------------
