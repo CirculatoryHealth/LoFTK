@@ -35,8 +35,8 @@ All scripts are annotated for debugging purposes - and future reference. The scr
 - `Bash`
 - [Ensembl Variant Effect Predictor (VEP)](https://github.com/Ensembl/ensembl-vep)
 - [`LOFTEE`](https://github.com/konradjk/loftee) for GRCh37
-  - Ancestral sequence (human_ancestor.fa[.gz|.rz])
-  - PhyloCSF database (phylocsf.sql) for conservation filters
+  - [Ancestral sequence](https://github.com/konradjk/loftee#:~:text=slow).%20Default%3A%20fast.-,human_ancestor_fa,-Location%20of%20human_ancestor) `(human_ancestor.fa[.gz|.rz])`
+  - [PhyloCSF database](https://github.com/konradjk/loftee#:~:text=checked%20and%20filtered.-,conservation_file,-The%20required%20SQL) `(phylocsf.sql)` for conservation filters
 - [`LOFTEE`](https://github.com/konradjk/loftee/tree/grch38) for GRCh38
   - GERP scores bigwig
   - Ancestral sequence
@@ -81,6 +81,7 @@ descriptive_stat.sh               | Descriptive analysis             | Read only
 
 For more details and [examples] about [**input files**](https://github.com/CirculatoryHealth/LoFTK/wiki/Input-files) are explained in the [wiki](https://github.com/CirculatoryHealth/LoFTK/wiki).
 
+--------------
 
 ## Outputs
 **LoFTK** will generate four files as an output at the end of the analysis. The [LoFTK outputs](https://github.com/CirculatoryHealth/LoFTK/wiki/LoFTK-outputs) in the [wiki](https://github.com/CirculatoryHealth/LoFTK/wiki) contains more explanation.
