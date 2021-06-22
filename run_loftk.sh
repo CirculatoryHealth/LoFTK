@@ -54,7 +54,7 @@ script_copyright_message() {
 	echo "+ Copyright (c) 2020 University Medical Center Utrecht                                                  +"
 	echo "+                                                                                                       +"
 	echo "+ Creative Commons Attribution Share Alike 4.0 International                                            +"
-	echo "+                                                                                                       +" 
+	echo "+                                                                                                       +"
 	echo "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 }
 
@@ -116,11 +116,11 @@ else
     elif [[ ${DATA_TYPE} == "genotype" ]] && [[ ${FILE_FORMAT} == "VCF" ]]; then
 	echo "LoFTK will analyze the ${DATA_TYPE} data that exist in ${FILE_FORMAT} files."
 	${LOFTK}/LoF_annotation.sh ${CONFIGURATIONFILE}
-    elif [[ ${DATA_TYPE} == "exome" ]] && [[ ${FILE_FORMAT} == "VCF" ]]; then
+elif [[ ${DATA_TYPE} == "exome" || ${DATA_TYPE} == "genome" ]] && [[ ${FILE_FORMAT} == "VCF" ]]; then
         echo "LoFTK will analyze the ${DATA_TYPE} data that exist in ${FILE_FORMAT} files."
 	${LOFTK}/LoF_annotation.sh ${CONFIGURATIONFILE}
     else
-	echo "We only perfomr analysis of genotype and exome data in IMPUTE2 and VCF input files."
+	echo "We only perfomr analysis of genotyped data in IMPUTE2 and VCF input files, or sequencing [exome/genome] data in VCF only"
 	echo ""
 	echo "Please check DATA_TYPE and FILE_FORMAT in LoF.config file."
     fi
