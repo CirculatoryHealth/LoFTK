@@ -45,7 +45,7 @@ All scripts are annotated for debugging purposes - and future reference. The scr
 
 --------------
 
-### Usage
+## Usage
 The only script the user should use is the `run_loftk.sh` script in conjunction with a configuration file `LoF.config`. It is required to set up the configuration file `LoF.config` before run any analysis, follow the [instruction](https://github.com/CirculatoryHealth/LoFTK/wiki/Configuration) in the [wiki](https://github.com/CirculatoryHealth/LoFTK/wiki).
 
 You can run **LoFTK** using the following command:
@@ -70,7 +70,7 @@ descriptive_stat.sh               | Descriptive analysis             | Read only
 
 --------------
 
-### Inputs
+## Inputs
 **LoFTK** permits two common file formats as an input:
   1. Variant Call Format (VCF).
     - You can find VCF specification [here](https://samtools.github.io/hts-specs/VCFv4.2.pdf).
@@ -82,7 +82,7 @@ descriptive_stat.sh               | Descriptive analysis             | Read only
 For more details and [examples] about [**input files**](https://github.com/CirculatoryHealth/LoFTK/wiki/Input-files) are explained in the [wiki](https://github.com/CirculatoryHealth/LoFTK/wiki).
 
 
-### Outputs
+## Outputs
 **LoFTK** will generate four files as an output at the end of the analysis. The [LoFTK outputs](https://github.com/CirculatoryHealth/LoFTK/wiki/LoFTK-outputs) in the [wiki](https://github.com/CirculatoryHealth/LoFTK/wiki) contains more explanation.
 
   1. [[project_name]_snp.counts](https://github.com/CirculatoryHealth/LoFTK/wiki/LoFTK-outputs): LoF variants and individuals.
