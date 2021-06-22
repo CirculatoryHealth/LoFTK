@@ -41,7 +41,7 @@ All scripts are annotated for debugging purposes - and future reference. The scr
   - GERP scores bigwig [`(gerp_bigwig)`](https://github.com/konradjk/loftee/tree/grch38#:~:text=contain%20this%20path.-,gerp_bigwig,-Location%20of%20GERP)
   - Ancestral sequence [`(human_ancestor_fa)`](https://github.com/konradjk/loftee/tree/grch38#:~:text=download%20for%20GRCh38.-,human_ancestor_fa,-Location%20of%20human_ancestor)
   - PhyloCSF database [`(loftee.sql.gz)`](https://github.com/konradjk/loftee/tree/grch38#:~:text=checked%20and%20filtered.-,conservation_file,-Location%20of%20file)
-- [`samtools`](https://github.com/samtools/samtools) (must be on path)
+- [`samtools`](https://github.com/samtools/samtools) ([must be on path](https://github.com/CirculatoryHealth/LoFTK/wiki/Instillation-and-Requirements#samtools-must-be-on-path))
 
 --------------
 
