@@ -35,8 +35,8 @@ All scripts are annotated for debugging purposes - and future reference. The scr
 - `Bash`
 - [Ensembl Variant Effect Predictor (VEP)](https://github.com/Ensembl/ensembl-vep)
 - [`LOFTEE`](https://github.com/konradjk/loftee) for GRCh37
-  - [Ancestral sequence](https://github.com/konradjk/loftee#:~:text=slow).%20Default%3A%20fast.-,human_ancestor_fa,-Location%20of%20human_ancestor) `(human_ancestor.fa[.gz|.rz])`
-  - [PhyloCSF database](https://github.com/konradjk/loftee#:~:text=checked%20and%20filtered.-,conservation_file,-The%20required%20SQL) `(phylocsf.sql)` for conservation filters
+  - Ancestral sequence [`(human_ancestor.fa[.gz|.rz])`](https://github.com/konradjk/loftee#:~:text=slow).%20Default%3A%20fast.-,human_ancestor_fa,-Location%20of%20human_ancestor)
+  - PhyloCSF database [`(phylocsf.sql)`](https://github.com/konradjk/loftee#:~:text=checked%20and%20filtered.-,conservation_file,-The%20required%20SQL) for conservation filters
 - [`LOFTEE`](https://github.com/konradjk/loftee/tree/grch38) for GRCh38
   - GERP scores bigwig
   - Ancestral sequence
