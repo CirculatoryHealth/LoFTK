@@ -369,14 +369,14 @@ else
 
     LOF_GENE_ANNOTATION="LoF_gene_${PROJECTNAME}"
     LOF_SNP_ANNOTATION="LoF_snp_${PROJECTNAME}"
-    echo "#!/bin/bash" > ${OUTPUTDIR}/stat_desccription_${PROJECTNAME}.sh
+    echo "#!/bin/bash" > ${OUTPUTDIR}/stat_desc_${PROJECTNAME}.sh
     DIR_CONFG=$(realpath "$CONFIGURATIONFILE")
-    echo "${LOFTK}/stat_desccription.sh ${DIR_CONFG}" >> ${OUTPUTDIR}/stat_desccription_${PROJECTNAME}.sh
+    echo "${LOFTK}/stat_desc.sh ${DIR_CONFG}" >> ${OUTPUTDIR}/stat_desc_${PROJECTNAME}.sh
 
     LOFDEPENDACY=$(squeue -u ${USERNAME} -n LoF_gene_${PROJECTNAME},LoF_snp_${PROJECTNAME} | tail -n +2 | awk '{print $1}' | ${TRANSPOSE} | sed 's/\t/,/g')
 
     echo "Job ID for STAT_DESC_${PROJECTNAME}: ${LOFDEPENDACY}"
 
-    sbatch --job-name=STAT_DESC_${PROJECTNAME} --dependency=afterok:${LOFDEPENDACY} -e STAT_DESC_${PROJECTNAME}.error -o STAT_DESC_${PROJECTNAME}.log -t ${QUEUE_STAT_DESC} --mem=${VMEM_STAT_DESC} --mail-user=${EMAIL} --mail-type=${MAILTYPE} -D ${OUTPUTDIR} ${OUTPUTDIR}/stat_desccription_${PROJECTNAME}.sh
+    sbatch --job-name=STAT_DESC_${PROJECTNAME} --dependency=afterok:${LOFDEPENDACY} -e STAT_DESC_${PROJECTNAME}.error -o STAT_DESC_${PROJECTNAME}.log -t ${QUEUE_STAT_DESC} --mem=${VMEM_STAT_DESC} --mail-user=${EMAIL} --mail-type=${MAILTYPE} -D ${OUTPUTDIR} ${OUTPUTDIR}/stat_desc_${PROJECTNAME}.sh
 
 fi   # For [$# -lt 1]
