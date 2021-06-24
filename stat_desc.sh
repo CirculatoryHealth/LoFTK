@@ -76,7 +76,6 @@ if [[ $# -lt 1 ]]; then
     script_arguments_error "You must supply at least [1] argument when running a LoF analysis!"
 
 else
-    TRANSPOSE=${LOFTK}/bin/transpose.pl
 
     ### LOADING CONFIGURATION FILE
     # Loading the configuration file (please refer to the LoFToolKit-Manual for specifications of this file).
@@ -90,7 +89,8 @@ else
     PROJECTNAME=${PROJECTNAME} # e.g. "ukb"
     LOFTK=${LOFTOOLKIT}
     OUTPUTDIR=${ROOTDIR}/${PROJECTNAME}_LoF_output
-
+    TRANSPOSE=${LOFTK}/bin/transpose.pl
+    
     echo "HELLO"
     echo "$CONFIGURATIONFILE"
     echo "$ROOTDIR"
