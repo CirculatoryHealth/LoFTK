@@ -90,7 +90,7 @@ else
     LOFTK=${LOFTOOLKIT}
     OUTPUTDIR=${ROOTDIR}/${PROJECTNAME}_LoF_output
     TRANSPOSE=${LOFTK}/bin/transpose.pl
-    
+
     echo "HELLO"
     echo "$CONFIGURATIONFILE"
     echo "$ROOTDIR"
@@ -117,12 +117,12 @@ else
     het_gene_median=`${PERL} ${TRANSPOSE} ${lof_gene} | tail -n +8 | cut -f 2- | sed 's/[^1]//g' | awk '{print length }' | sort -g | awk '{count[NR] = $1;} END {if (NR % 2) {print count[(NR + 1) / 2];}else {print (count[(NR / 2)] + count[(NR / 2) + 1]) / 2.0;}}'`
     hom_gene_median=`${PERL} ${TRANSPOSE} ${lof_gene} | tail -n +8 | cut -f 2- | sed 's/[^2]//g' | awk '{print length }' | sort -g | awk '{count[NR] = $1;} END {if (NR % 2) {print count[(NR + 1) / 2];}else {print (count[(NR / 2)] + count[(NR / 2) + 1]) / 2.0;}}'`
 
-    echo "Cohort ${PROJECTNAME} \(n=${SAMPLE_SIZE}\)" > ${OUTPUTDIR}/${PROJECTNAME}_output.info
+    echo "Cohort ${PROJECTNAME} (n=${SAMPLE_SIZE})" > ${OUTPUTDIR}/${PROJECTNAME}_output.info
     echo "" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
     echo "LoF genes contain LoF variants" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
-    echo "$gene_one genes contain heterozygous LoF, $gene_two genes contain homozygous LoF, $gene_onetwo as a total of genes contain LoF variant" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
-    echo "$genehetmin - $genehetmax genes with heterozygous LoF variants per sample" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
-    echo "$genehomomin - $genehomomax genes with homozygous LoF variants per sample" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
+    echo "$gene_one genes contain 1-copy loss, $gene_two genes contain 2-copy loss, $gene_onetwo as a total of genes contain LoF variant" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
+    echo "$genehetmin - $genehetmax genes with 1-copy loss per sample" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
+    echo "$genehomomin - $genehomomax genes with 2-copy loss per sample" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
     echo "Median of LoF genes per sample is ${gene_median}" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
     echo "Median of 1-copy LoF genes per sample is ${het_gene_median}" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
     echo "Median of 2-copy LoF genes per sample is ${hom_gene_median}" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
@@ -161,7 +161,7 @@ else
     echo "$snphetmin - $snphetmax heterozygous LoF variants per sample" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
     echo "$snphomomin - $snphomomax homozygous LoF variants per sample" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
     echo "Median of LoF variants per sample is ${snp_median}" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
-    echo "Median of het. LoF variants per sample is ${het_snp_median}" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
-    echo "Median of homo. LoF variants per sample is ${homo_snp_median}" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
+    echo "Median of heterozygous LoF variants per sample is ${het_snp_median}" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
+    echo "Median of homozygous LoF variants per sample is ${homo_snp_median}" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
 
 fi
