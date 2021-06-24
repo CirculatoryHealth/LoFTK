@@ -1,0 +1,17 @@
+Cohort Test_VCF (n=500)
+
+LoF genes contain LoF variants
+49 genes contain 1-copy loss, 29 genes contain 2-copy loss, 49 as a total of genes contain LoF variant
+3 - 17 genes with 1-copy loss per sample
+0 - 7 genes with 2-copy loss per sample
+Median of LoF genes per sample is 12
+Median of 1-copy LoF genes per sample is 10
+Median of 2-copy LoF genes per sample is 2
+
+LoF variants
+66 heterozygous LoF, 37 homozygous LoF, 66 total of LoF variant
+3 - 19 heterozygous LoF variants per sample
+0 - 8 homozygous LoF variants per sample
+Median of LoF variants per sample is 13
+Median of heterozygous LoF variants per sample is 11
+Median of homozygous LoF variants per sample is 2
