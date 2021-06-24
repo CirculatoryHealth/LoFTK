@@ -67,7 +67,16 @@ run_loftk.sh                      | Main LoFTK script                | Read only
 LoF_annotation.sh                 | Annotation of LoF variants/genes | Read only
 allele_to_vcf.sh                  | Converting IMPUT2 format to VCF  | Read only
 descriptive_stat.sh               | Descriptive analysis             | Read only
---
+
+##
+
+### Merge the counts files of multiple cohorts
+
+
+##
+
+### Calculates the ‘mismatch’ between two individuals
+
 
 
 
