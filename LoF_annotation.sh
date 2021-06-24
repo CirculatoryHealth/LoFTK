@@ -62,7 +62,7 @@ script_arguments_error() {
 	echoerror "$1" # Additional message
 	echoerror "- Argument #1 is path_to/filename of the configuration file."
 	echoerror ""
-	echoerror "An example command would be: run_loftk.sh [arg1]""
+	echoerror "An example command would be: run_loftk.sh [arg1]"
 	echoerror "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
  	echo ""
 	script_copyright_message
