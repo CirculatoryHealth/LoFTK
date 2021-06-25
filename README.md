@@ -81,8 +81,8 @@ This scripts allows you to merge the counts files of different cohorts. By defau
 This script calculates the ‘mismatch’ between two individuals. 1 for mismatch 0 for not mismatch. 
 - You must create a file contains two columns, where both columns have list of individual IDs 
 - First column need to contain indvidual IDs that you are interested in genes that are fully inactive but active in 1 or two copies in the second column. 
-- - For example in solid organ transplantation, when you are interested in genes that are fully inactive in the recipient but active in 1 or two copies in the donor, you would put the recipient IDs in the first column of the specified file and the donor IDs (matching, obviously) in the second column.
-- -  For any other research question you need to decide for yourself who to put in which column. I.e. for stem cell transplant you would swap the donor and recipient since the donor provides the immune system then.
+-- For example in solid organ transplantation, when you are interested in genes that are fully inactive in the recipient but active in 1 or two copies in the donor, you would put the recipient IDs in the first column of the specified file and the donor IDs (matching, obviously) in the second column.
+--  For any other research question you need to decide for yourself who to put in which column. I.e. for stem cell transplant you would swap the donor and recipient since the donor provides the immune system then.
 
 
 
