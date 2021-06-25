@@ -78,7 +78,7 @@ This scripts allows you to merge the counts files of different cohorts. By defau
 ```bash
 perl merge_gene_lof_counts.pl -i cohortX.counts,cohortY.counts,cohortZ.counts -o merged_cohorts.counts -c
 ```
-Run the the following to know how to use optins:
+Run the the following to know how to use options:
 ```bash
 perl merge_gene_lof_counts.pl --help
 ```
