@@ -83,18 +83,20 @@ Run the the following to know how to use options:
 perl merge_gene_lof_counts.pl --help
 ```
 
-### Calculates the ‘mismatch’ between two individuals
-This script calculates the ‘mismatch’ between two individuals. 1 for mismatch 0 for not mismatch.
-- You must create a file contains two columns (tab-separated), where both columns have list of individual IDs
-- First column need to contain individual IDs that you are interested in genes that are fully inactive but active in 1 or 2 copies in the second column.
-  - For example in solid organ transplantation, when you are interested in genes that are fully inactive in the recipient but active in 1 or 2 copies in the donor, you would put the recipient IDs in the first column of the specified file and the donor IDs (matching, obviously) in the second column.
-  - For any other research question you need to decide for yourself who to put in which column. I.e. for stem cell transplant you would swap the donor and recipient since the donor provides the immune system then.
+### Mismatched genes between samples
+This script can be used to determine ‘mismatched’ genes between samples; these are genes that are active in one or two copies in one sample and completely inactive (two-copy loss) in the other sample. This feature helps study interactions between human genomes, for instance during pregnancy (maternal vs fetal genome) and after stem cell or solid organ transplantation (donor vs recipient genome).
+
+- You must create a file `pairs_file.txt` with two columns (tab-separated), where both columns have list of individual IDs and each line has paired subjects.
+- The first column must contain individual IDs for which you want to examine the mismatch of knocked out genes with the 1 or 2 active copies in the other pair.
+- Output file contains encodings for individuals (from 1st column in `pairs_file.txt`), where `1` for mismatch `0` for not mismatch.
+    - `1`: mismatch where sample in the 2nd column has active gene.
+    - `0`: not mismatch where paired samples either having both a knocked out gene or none of them carry LoF gene.
 
 
 **Run the below command:**
 
 ```bash
-perl gene_lof_counts_to_dyad_lofs.pl cohort_X_Y_pairs.txt input_file.counts output_file.dyads
+perl gene_lof_counts_to_dyad_lofs.pl pairs_file.txt input_file.counts output_file.dyads
 ```
 
 
