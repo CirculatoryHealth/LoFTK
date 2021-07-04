@@ -1,6 +1,6 @@
 <h1 align="center">
   <a href="https://github.com/CirculatoryHealth/LoFTK">
-    <img src="/docs/images/LoFTK_logo.jpg" alt="Logo" width="150" height="125">
+    <img src="/docs/images/LoFTK_logo.jpg" alt="Logo" width="250" height="125">
   </a>
 </h1>
 
