@@ -1,3 +1,11 @@
+<h1 align="center">
+  <a href="https://github.com/CirculatoryHealth/LoFTK">
+    <img src="{{cookiecutter.repo_slug}}/docs/images/LoFTK_logo.jpg" alt="Logo" width="125" height="125">
+  </a>
+</h1>
+
+<div align="center">
+
 LOFTK (Loss-of-Function ToolKit)
 ============
 [![DOI]()]()
