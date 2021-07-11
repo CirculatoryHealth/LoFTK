@@ -105,16 +105,30 @@ else
     SAMPLE_SIZE=$(head -1 ${lof_gene}  | cut -f8- | wc -w)
 
 ## LoF genes
+#    gene_onetwo=`cut -f 8- ${lof_gene} | tail -n +2 | awk '$0~/1/ || $0~/2/' | wc -l`
+#    gene_one=`cut -f 8- ${lof_gene} | tail -n +2 | awk '$0~/1/' | wc -l `
+#    gene_two=`cut -f 8- ${lof_gene} | tail -n +2 | awk '$0~/2/' | wc -l `
+#    genehomomin=`${PERL} ${TRANSPOSE} ${lof_gene} | tail -n +8 | cut -f 2- | sed 's/[^2]//g' | awk '{ print length }' | sort -g | head -1`
+#    genehomomax=`${PERL} ${TRANSPOSE} ${lof_gene} | tail -n +8 | cut -f 2- | sed 's/[^2]//g' | awk '{ print length }' | sort -gr | head -1`
+#    genehetmin=`${PERL} ${TRANSPOSE} ${lof_gene} | tail -n +8 | cut -f 2- | sed 's/[^1]//g' | awk '{ print length }' | sort -g | head -1`
+#    genehetmax=`${PERL} ${TRANSPOSE} ${lof_gene} | tail -n +8 | cut -f 2- | sed 's/[^1]//g' | awk '{ print length }' | sort -gr | head -1`
+#    gene_median=`${PERL} ${TRANSPOSE} ${lof_gene} | tail -n +8 | cut -f 2- | sed 's/[^12]//g' | awk '{print length }' | sort -g | awk '{count[NR] = $1;} END {if (NR % 2) {print count[(NR + 1) / 2];}else {print (count[(NR / 2)] + count[(NR / 2) + 1]) / 2.0;}}'`
+#    het_gene_median=`${PERL} ${TRANSPOSE} ${lof_gene} | tail -n +8 | cut -f 2- | sed 's/[^1]//g' | awk '{print length }' | sort -g | awk '{count[NR] = $1;} END {if (NR % 2) {print count[(NR + 1) / 2];}else {print (count[(NR / 2)] + count[(NR / 2) + 1]) / 2.0;}}'`
+#    hom_gene_median=`${PERL} ${TRANSPOSE} ${lof_gene} | tail -n +8 | cut -f 2- | sed 's/[^2]//g' | awk '{print length }' | sort -g | awk '{count[NR] = $1;} END {if (NR % 2) {print count[(NR + 1) / 2];}else {print (count[(NR / 2)] + count[(NR / 2) + 1]) / 2.0;}}'`
+
+## New algorithm (to avoid transposing)
     gene_onetwo=`cut -f 8- ${lof_gene} | tail -n +2 | awk '$0~/1/ || $0~/2/' | wc -l`
     gene_one=`cut -f 8- ${lof_gene} | tail -n +2 | awk '$0~/1/' | wc -l `
     gene_two=`cut -f 8- ${lof_gene} | tail -n +2 | awk '$0~/2/' | wc -l `
-    genehomomin=`${PERL} ${TRANSPOSE} ${lof_gene} | tail -n +8 | cut -f 2- | sed 's/[^2]//g' | awk '{ print length }' | sort -g | head -1`
-    genehomomax=`${PERL} ${TRANSPOSE} ${lof_gene} | tail -n +8 | cut -f 2- | sed 's/[^2]//g' | awk '{ print length }' | sort -gr | head -1`
-    genehetmin=`${PERL} ${TRANSPOSE} ${lof_gene} | tail -n +8 | cut -f 2- | sed 's/[^1]//g' | awk '{ print length }' | sort -g | head -1`
-    genehetmax=`${PERL} ${TRANSPOSE} ${lof_gene} | tail -n +8 | cut -f 2- | sed 's/[^1]//g' | awk '{ print length }' | sort -gr | head -1`
-    gene_median=`${PERL} ${TRANSPOSE} ${lof_gene} | tail -n +8 | cut -f 2- | sed 's/[^12]//g' | awk '{print length }' | sort -g | awk '{count[NR] = $1;} END {if (NR % 2) {print count[(NR + 1) / 2];}else {print (count[(NR / 2)] + count[(NR / 2) + 1]) / 2.0;}}'`
-    het_gene_median=`${PERL} ${TRANSPOSE} ${lof_gene} | tail -n +8 | cut -f 2- | sed 's/[^1]//g' | awk '{print length }' | sort -g | awk '{count[NR] = $1;} END {if (NR % 2) {print count[(NR + 1) / 2];}else {print (count[(NR / 2)] + count[(NR / 2) + 1]) / 2.0;}}'`
-    hom_gene_median=`${PERL} ${TRANSPOSE} ${lof_gene} | tail -n +8 | cut -f 2- | sed 's/[^2]//g' | awk '{print length }' | sort -g | awk '{count[NR] = $1;} END {if (NR % 2) {print count[(NR + 1) / 2];}else {print (count[(NR / 2)] + count[(NR / 2) + 1]) / 2.0;}}'`
+    genehomomin=`cut -f 8- ${lof_gene} | sed '2,$s/1/0/g;2,$s/2/1/g' | awk 'NR==1   { for (i=1; i<=NF; i++) header[i]=$i; next; }{ for (i=1; i<=NF; i++) total[i] += $i; }END     { for (i=1; i<=NF; i++) print header[i] "\t" total[i]+0 }' | sort -k 2g | head -1 | cut -f2`
+    genehomomax=`cut -f 8- ${lof_gene} | sed '2,$s/1/0/g;2,$s/2/1/g' | awk 'NR==1   { for (i=1; i<=NF; i++) header[i]=$i; next; }{ for (i=1; i<=NF; i++) total[i] += $i; }END     { for (i=1; i<=NF; i++) print header[i] "\t" total[i]+0 }' | sort -k 2gr | head -1 | cut -f2`
+    genehetmin=`cut -f 8- ${lof_gene} | sed '2,$s/2/0/g' | awk 'NR==1   { for (i=1; i<=NF; i++) header[i]=$i; next; }{ for (i=1; i<=NF; i++) total[i] += $i; }END     { for (i=1; i<=NF; i++) print header[i] "\t" total[i]+0 }' | sort -k 2g | head -1 | cut -f2`
+    genehetmax=`cut -f 8- ${lof_gene} | sed '2,$s/2/0/g' | awk 'NR==1   { for (i=1; i<=NF; i++) header[i]=$i; next; }{ for (i=1; i<=NF; i++) total[i] += $i; }END     { for (i=1; i<=NF; i++) print header[i] "\t" total[i]+0 }' | sort -k 2gr | head -1 | cut -f2`
+    gene_median=`cut -f 8- ${lof_gene} | sed '2,$s/2/1/g' | awk 'NR==1   { for (i=1; i<=NF; i++) header[i]=$i; next; }{ for (i=1; i<=NF; i++) total[i] += $i; }END     { for (i=1; i<=NF; i++) print header[i] "\t" total[i]+0 }' | sort -k 2g | cut -f2 | awk '{count[NR] = $1;} END {if (NR % 2) {print count[(NR + 1) / 2];}else {print (count[(NR / 2)] + count[(NR / 2) + 1]) / 2.0;}}'`
+    het_gene_median=`cut -f 8- ${lof_gene} | sed '2,$s/2/0/g' | awk 'NR==1   { for (i=1; i<=NF; i++) header[i]=$i; next; }{ for (i=1; i<=NF; i++) total[i] += $i; }END     { for (i=1; i<=NF; i++) print header[i] "\t" total[i]+0 }' | sort -k 2g | cut -f2 | awk '{count[NR] = $1;} END {if (NR % 2) {print count[(NR + 1) / 2];}else {print (count[(NR / 2)] + count[(NR / 2) + 1]) / 2.0;}}'`
+    hom_gene_median=`cut -f 8- ${lof_gene} | sed '2,$s/1/0/g;2,$s/2/1/g' | awk 'NR==1   { for (i=1; i<=NF; i++) header[i]=$i; next; }{ for (i=1; i<=NF; i++) total[i] += $i; }END     { for (i=1; i<=NF; i++) print header[i] "\t" total[i]+0 }' | sort -k 2g | cut -f2 | awk '{count[NR] = $1;} END {if (NR % 2) {print count[(NR + 1) / 2];}else {print (count[(NR / 2)] + count[(NR / 2) + 1]) / 2.0;}}'`
+
+
 
     echo "Cohort ${PROJECTNAME} (n=${SAMPLE_SIZE})" > ${OUTPUTDIR}/${PROJECTNAME}_output.info
     echo "" >> ${OUTPUTDIR}/${PROJECTNAME}_output.info
@@ -141,16 +155,29 @@ else
 
     else
 
-	snp_onetwo=`cut -f 10- ${lof_snp} | tail -n +2 | awk '$0~/1/ || $0~/2/' | wc -l`
+#	snp_onetwo=`cut -f 10- ${lof_snp} | tail -n +2 | awk '$0~/1/ || $0~/2/' | wc -l`
+#	snp_one=`cut -f 10- ${lof_snp} | tail -n +2 | awk '$0~/1/' | wc -l `
+#	snp_two=`cut -f 10- ${lof_snp} | tail -n +2 | awk '$0~/2/' | wc -l `
+#	snphomomin=`${PERL} ${TRANSPOSE} ${lof_snp} | tail -n +10 | cut -f 2- | sed 's/[^2]//g' | awk '{ print length }' | sort -g | head -1`
+#	snphomomax=`${PERL} ${TRANSPOSE} ${lof_snp} | tail -n +10 | cut -f 2- | sed 's/[^2]//g' | awk '{ print length }' | sort -gr | head -1`
+#	snphetmin=`${PERL} ${TRANSPOSE} ${lof_snp} | tail -n +10 | cut -f 2- | sed 's/[^1]//g' | awk '{ print length }' | sort -g | head -1`
+#	snphetmax=`${PERL} ${TRANSPOSE} ${lof_snp} | tail -n +10 | cut -f 2- | sed 's/[^1]//g' | awk '{ print length }' | sort -gr | head -1`
+#	snp_median=`${PERL} ${TRANSPOSE} ${lof_snp} | tail -n +10 | cut -f 2- | sed 's/[^12]//g' | awk '{print length }' | sort -g | awk '{count[NR] = $1;} END {if (NR % 2) {print count[(NR + 1) / 2];}else {print (count[(NR / 2)] + count[(NR / 2) + 1]) / 2.0;}}'`
+#	het_snp_median=`${PERL} ${TRANSPOSE} ${lof_snp} | tail -n +10 | cut -f 2- | sed 's/[^1]//g' | awk '{print length }' | sort -g | awk '{count[NR] = $1;} END {if (NR % 2) {print count[(NR + 1) / 2];}else {print (count[(NR / 2)] + count[(NR / 2) + 1]) / 2.0;}}'`
+#	homo_snp_median=`${PERL} ${TRANSPOSE} ${lof_snp} | tail -n +10 | cut -f 2- | sed 's/[^2]//g' | awk '{print length }' | sort -g | awk '{count[NR] = $1;} END {if (NR % 2) {print count[(NR + 1) / 2];}else {print (count[(NR / 2)] + count[(NR / 2) + 1]) / 2.0;}}'`
+
+  ## New algorithm (to avoid transposing)
+
+  snp_onetwo=`cut -f 10- ${lof_snp} | tail -n +2 | awk '$0~/1/ || $0~/2/' | wc -l`
 	snp_one=`cut -f 10- ${lof_snp} | tail -n +2 | awk '$0~/1/' | wc -l `
 	snp_two=`cut -f 10- ${lof_snp} | tail -n +2 | awk '$0~/2/' | wc -l `
-	snphomomin=`${PERL} ${TRANSPOSE} ${lof_snp} | tail -n +10 | cut -f 2- | sed 's/[^2]//g' | awk '{ print length }' | sort -g | head -1`
-	snphomomax=`${PERL} ${TRANSPOSE} ${lof_snp} | tail -n +10 | cut -f 2- | sed 's/[^2]//g' | awk '{ print length }' | sort -gr | head -1`
-	snphetmin=`${PERL} ${TRANSPOSE} ${lof_snp} | tail -n +10 | cut -f 2- | sed 's/[^1]//g' | awk '{ print length }' | sort -g | head -1`
-	snphetmax=`${PERL} ${TRANSPOSE} ${lof_snp} | tail -n +10 | cut -f 2- | sed 's/[^1]//g' | awk '{ print length }' | sort -gr | head -1`
-	snp_median=`${PERL} ${TRANSPOSE} ${lof_snp} | tail -n +10 | cut -f 2- | sed 's/[^12]//g' | awk '{print length }' | sort -g | awk '{count[NR] = $1;} END {if (NR % 2) {print count[(NR + 1) / 2];}else {print (count[(NR / 2)] + count[(NR / 2) + 1]) / 2.0;}}'`
-	het_snp_median=`${PERL} ${TRANSPOSE} ${lof_snp} | tail -n +10 | cut -f 2- | sed 's/[^1]//g' | awk '{print length }' | sort -g | awk '{count[NR] = $1;} END {if (NR % 2) {print count[(NR + 1) / 2];}else {print (count[(NR / 2)] + count[(NR / 2) + 1]) / 2.0;}}'`
-	homo_snp_median=`${PERL} ${TRANSPOSE} ${lof_snp} | tail -n +10 | cut -f 2- | sed 's/[^2]//g' | awk '{print length }' | sort -g | awk '{count[NR] = $1;} END {if (NR % 2) {print count[(NR + 1) / 2];}else {print (count[(NR / 2)] + count[(NR / 2) + 1]) / 2.0;}}'`
+	snphomomin=`cut -f 10- ${lof_snp} | sed '2,$s/1/0/g;2,$s/2/1/g' | awk 'NR==1   { for (i=1; i<=NF; i++) header[i]=$i; next; }{ for (i=1; i<=NF; i++) total[i] += $i; }END     { for (i=1; i<=NF; i++) print header[i] "\t" total[i]+0 }' | sort -k 2g | head -1 | cut -f2`
+	snphomomax=`cut -f 10- ${lof_snp} | sed '2,$s/1/0/g;2,$s/2/1/g' | awk 'NR==1   { for (i=1; i<=NF; i++) header[i]=$i; next; }{ for (i=1; i<=NF; i++) total[i] += $i; }END     { for (i=1; i<=NF; i++) print header[i] "\t" total[i]+0 }' | sort -k 2gr | head -1 | cut -f2`
+	snphetmin=`cut -f 10- ${lof_snp} | sed '2,$s/2/0/g' | awk 'NR==1   { for (i=1; i<=NF; i++) header[i]=$i; next; }{ for (i=1; i<=NF; i++) total[i] += $i; }END     { for (i=1; i<=NF; i++) print header[i] "\t" total[i]+0 }' | sort -k 2g | head -1 | cut -f2`
+	snphetmax=`cut -f 10- ${lof_snp} | sed '2,$s/2/0/g' | awk 'NR==1   { for (i=1; i<=NF; i++) header[i]=$i; next; }{ for (i=1; i<=NF; i++) total[i] += $i; }END     { for (i=1; i<=NF; i++) print header[i] "\t" total[i]+0 }' | sort -k 2gr | head -1 | cut -f2`
+	snp_median=`cut -f 10- ${lof_snp} | sed '2,$s/2/1/g' | awk 'NR==1   { for (i=1; i<=NF; i++) header[i]=$i; next; }{ for (i=1; i<=NF; i++) total[i] += $i; }END     { for (i=1; i<=NF; i++) print header[i] "\t" total[i]+0 }' | sort -k 2g | cut -f2 | awk '{count[NR] = $1;} END {if (NR % 2) {print count[(NR + 1) / 2];}else {print (count[(NR / 2)] + count[(NR / 2) + 1]) / 2.0;}}'`
+	het_snp_median=`cut -f 10- ${lof_snp} | sed '2,$s/2/0/g' | awk 'NR==1   { for (i=1; i<=NF; i++) header[i]=$i; next; }{ for (i=1; i<=NF; i++) total[i] += $i; }END     { for (i=1; i<=NF; i++) print header[i] "\t" total[i]+0 }' | sort -k 2g | cut -f2 | awk '{count[NR] = $1;} END {if (NR % 2) {print count[(NR + 1) / 2];}else {print (count[(NR / 2)] + count[(NR / 2) + 1]) / 2.0;}}'`
+	homo_snp_median=`cut -f 10- ${lof_snp} | sed '2,$s/1/0/g;2,$s/2/1/g' | awk 'NR==1   { for (i=1; i<=NF; i++) header[i]=$i; next; }{ for (i=1; i<=NF; i++) total[i] += $i; }END     { for (i=1; i<=NF; i++) print header[i] "\t" total[i]+0 }' | sort -k 2g | cut -f2 | awk '{count[NR] = $1;} END {if (NR % 2) {print count[(NR + 1) / 2];}else {print (count[(NR / 2)] + count[(NR / 2) + 1]) / 2.0;}}'`
 
     fi
 
