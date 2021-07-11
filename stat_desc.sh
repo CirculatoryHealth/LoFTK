@@ -91,7 +91,6 @@ else
     OUTPUTDIR=${ROOTDIR}/${PROJECTNAME}_LoF_output
     TRANSPOSE=${LOFTK}/bin/transpose.pl
 
-    echo "HELLO"
     echo "$CONFIGURATIONFILE"
     echo "$ROOTDIR"
 ### STEP 3 ###
