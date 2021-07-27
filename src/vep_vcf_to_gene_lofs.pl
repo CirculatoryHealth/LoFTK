@@ -18,6 +18,7 @@ my @INFO_FIELDS        = qw/ MAF INFO_SCORE CERTAINTY TYPE INFO_TYPE0 CONCORD_TY
 my $INFO_FIELD_DELIMITER = ';';
 my $MISSING_LOF_VALUE  = '.'; #Value to put in for individuals who have no LoF-annotated variants in a transcript.
 
+
 my $USAGE = <<"Quid hodie cogitare debeo?";
 $PROGRAM_NAME version $VERSION
 Copyright 2015, $AUTHOR
@@ -138,7 +139,7 @@ sub parse_genotype {
   #Given a VCF genotype entry, returns a reference to a 2-element array containing just the genotype values: 0, 1, or '.' (for missing).
   my $genotype_string = shift;
   $genotype_string =~ s/:.*$//; #Strip away anything that isn't the genotype part.
-  my @parsed_genotype = split /\|/ , $genotype_string; #Phased genotypes.
+  my @parsed_genotype = split /[\|]/ , $genotype_string; #Phased genotypes.
   return \@parsed_genotype;
 }
 
@@ -220,37 +221,54 @@ sub get_CAF {
   my ( $genes , $gene , $sample_names ) = ( @_ );
   my $total_samples = scalar @$sample_names; #Number of individuals.
   croak "Failed to extract sample count - can't compute LoF frequency.\n" unless $total_samples > 0;
-  my ( $total_single_copy_LoF , $total_two_copy_LoF ) = ( 0 , 0 );
+  my ( $total_single_copy_LoF , $total_two_copy_LoF , $total_compound_heterozygous , $total_homozygous , ) = ( 0 , 0 , 0 , 0 );
   for my $sample_index ( 0 .. $total_samples - 1 ) { #Iterate across individuals.
-    if ( $genes->{$gene}[$sample_index][0] and $genes->{$gene}[$sample_index][0] ne $MISSING_LOF_VALUE ) { #First phase has at least one LoF variant.
-      if ( $genes->{$gene}[$sample_index][1] and $genes->{$gene}[$sample_index][1] ne $MISSING_LOF_VALUE ) { #Second phase has LoF.
-	$total_two_copy_LoF++;
+      if ( $genes->{$gene}[$sample_index][0] and $genes->{$gene}[$sample_index][0] ne $MISSING_LOF_VALUE ) { #First phase has at least one LoF variant.
+	  if ( $genes->{$gene}[$sample_index][1] and $genes->{$gene}[$sample_index][1] ne $MISSING_LOF_VALUE ) { #Second phase has LoF.
+	      $total_two_copy_LoF++;
+	      if ( $genes->{$gene}[$sample_index][0] and $genes->{$gene}[$sample_index][0] ne $genes->{$gene}[$sample_index][1] and $genes->{$gene}[$sample_index][1] ) {
+		  $total_compound_heterozygous++;
+	      }
+	      else {
+		  $total_homozygous++;
+	      }
+	  }
+	  else {
+	      $total_single_copy_LoF++; #First phase only: single copy LoF.
+	  }
       }
-      else {
-	$total_single_copy_LoF++; #First phase only: single copy LoF.
+      else { #First phase has no LoF variants and was uninstantiated.
+	  if ( $genes->{$gene}[$sample_index][1] and $genes->{$gene}[$sample_index][1] ne $MISSING_LOF_VALUE ) {
+	      $total_single_copy_LoF++;
+	  }
       }
-    }
-    else { #First phase has no LoF variants and was uninstantiated.
-      if ( $genes->{$gene}[$sample_index][1] and $genes->{$gene}[$sample_index][1] ne $MISSING_LOF_VALUE ) {
-	$total_single_copy_LoF++;
-      }
-    }
   }
+
   #Now compute LoF fractions.
-  my ( $single_copy_LoF_fraction , $two_copy_LoF_fraction );
+  my ( $single_copy_LoF_fraction , $two_copy_LoF_fraction , $total_heterozygous_LoF , $total_homozygous_LoF , $total_compound_heterozygous_LoF , $single_copy_LoF_fraction_carrier , $two_copy_LoF_fraction_carrier );
   unless ( $total_single_copy_LoF == 0 ) {
-    $single_copy_LoF_fraction = $total_single_copy_LoF / $total_samples;
+      $single_copy_LoF_fraction = $total_single_copy_LoF / $total_samples;
+      $single_copy_LoF_fraction_carrier = $total_single_copy_LoF ;
+      $total_heterozygous_LoF = $total_single_copy_LoF ;
   }
   else {
-    $single_copy_LoF_fraction = 0;
+      $single_copy_LoF_fraction = 0;
+#@#      $single_copy_LoF_fraction_carrier = 0;
+      $total_heterozygous_LoF = 0;
   }
   unless ( $total_two_copy_LoF == 0 ) {
-    $two_copy_LoF_fraction = $total_two_copy_LoF / $total_samples;
+      $two_copy_LoF_fraction = $total_two_copy_LoF / $total_samples;
+#@#      $two_copy_LoF_fraction_carrier = $total_two_copy_LoF;
+      $total_homozygous_LoF = $total_homozygous;
+      $total_compound_heterozygous_LoF = $total_compound_heterozygous;
   }
   else {
-    $two_copy_LoF_fraction = 0;
+      $two_copy_LoF_fraction = 0;
+#@#      $two_copy_LoF_fraction_carrier = 0;
+      $total_homozygous_LoF = 0;
+      $total_compound_heterozygous_LoF = 0;
   }
-  return ( $single_copy_LoF_fraction , $two_copy_LoF_fraction ); #Return two-element array reference.
+  return ( $single_copy_LoF_fraction , $two_copy_LoF_fraction , $total_heterozygous_LoF , $total_homozygous_LoF , $total_compound_heterozygous_LoF ); #Return two-element array reference.
 }
 
 sub write_output_file {
@@ -260,7 +278,9 @@ sub write_output_file {
   #If that variable doesn't exist, set it to the missing value $MISSING_LOF_VALUE.
   my ( $genes , $sample_names , $output_file ) = @_;
   my $output = IO::File->new( $output_file , 'w' );
-  $output->print( join "\t" , ( 'gene_ID' , 'gene_symbol' , 'single_copy_LoF_frequency' ,'two_copy_LoF_frequency' , @$sample_names ) ); #Print output header.
+#  $output->print( join "\t" , ( 'gene_ID' , 'gene_symbol' , 'single_copy_LoF_frequency' ,'two_copy_LoF_frequency' , @$sample_names ) ); #Print output header.
+  $output->print( join "\t" , ( 'gene_ID' , 'gene_symbol' , 'single_copy_LoF_frequency' ,'two_copy_LoF_frequency' , 'heterozygous_carriers' , 'homozygous_carriers' , 'compound_heterozygous_carriers' , @$sample_names ) ); #Print output header.
+
   $output->print( "\n" );
 
   for my $gene ( keys %$genes ) {

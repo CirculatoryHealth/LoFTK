@@ -201,28 +201,27 @@ sub get_CAF {
   #my ( $single_copy_LoF_fraction , $two_copy_LoF_fraction )  = get_CAF( $transcripts , $transcript , $sample_names )
   #When given a reference to the transcripts data structure and a particular transcript to extract, and a reference to an array of sample names,
   # return a reference to a 2-element array of single-copy LoF frequency and two-copy LoF frequency (called "CAF" by some).
-    my ( $SNPs , $SNP , $sample_names ) = ( @_ );
+  my ( $SNPs , $SNP , $sample_names ) = ( @_ );
   my $total_samples = scalar @$sample_names; #Number of individuals.
   croak "Failed to extract sample count - can't compute LoF frequency.\n" unless $total_samples > 0;
   my ( $total_single_copy_LoF , $total_two_copy_LoF ) = ( 0 , 0 );
   for my $sample_index ( 0 .. $total_samples - 1 ) { #Iterate across individuals.
 #    if ( $SNPs->{$SNP}->[$sample_index]->[0] ) { #First phase has at least one LoF variant.
 #      if ( $SNPs->{$SNP}->[$sample_index]->[1] ) { #Second phase has LoF.
-      if ( $SNPs->{$SNP}[$sample_index][0] and $SNPs->{$SNP}[$sample_index][0] ne $MISSING_LOF_VALUE ) { #First phase has at least one LoF variant.
-	  if ( $SNPs->{$SNP}[$sample_index][1] and $SNPs->{$SNP}[$sample_index][1] ne $MISSING_LOF_VALUE ) { #Second phase has LoF.
-	      $total_two_copy_LoF++;
-
-	  }
-	  else {
-              $total_single_copy_LoF++; #First phase only: single copy LoF.
-          }
+    if ( $SNPs->{$SNP}[$sample_index][0] and $SNPs->{$SNP}[$sample_index][0] ne $MISSING_LOF_VALUE ) { #First phase has at least one LoF variant.
+      if ( $SNPs->{$SNP}[$sample_index][1] and $SNPs->{$SNP}[$sample_index][1] ne $MISSING_LOF_VALUE ) { #Second phase has LoF.
+	     $total_two_copy_LoF++;
       }
-      else { #First phase has no LoF variants and was uninstantiated.
+      else {
+        $total_single_copy_LoF++; #First phase only: single copy LoF.
+      }
+    }
+    else { #First phase has no LoF variants and was uninstantiated.
 #	  if ( $SNPs->{$SNP}->[$sample_index]->[1] ) {
-	  if ( $SNPs->{$SNP}[$sample_index][1] and $SNPs->{$SNP}[$sample_index][1] ne $MISSING_LOF_VALUE ) {
-	      $total_single_copy_LoF++;
-	  }
+      if ( $SNPs->{$SNP}[$sample_index][1] and $SNPs->{$SNP}[$sample_index][1] ne $MISSING_LOF_VALUE ) {
+        $total_single_copy_LoF++;
       }
+    }
   }
     #Now compute LoF fractions.
     my ( $single_copy_LoF_fraction , $two_copy_LoF_fraction , $single_copy_LoF_fraction_carrier , $two_copy_LoF_fraction_carrier );
@@ -243,7 +242,7 @@ sub get_CAF {
 	$two_copy_LoF_fraction_carrier = 0;
     }
     return ( $single_copy_LoF_fraction , $two_copy_LoF_fraction , $single_copy_LoF_fraction_carrier , $two_copy_LoF_fraction_carrier ); #Return two-element array reference.
-}
+  }
 
 sub write_output_file {
   #write_output_file( $transcripts , $sample_names , $output_file )
