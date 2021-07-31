@@ -18,7 +18,6 @@ my @INFO_FIELDS        = qw/ MAF INFO_SCORE CERTAINTY TYPE INFO_TYPE0 CONCORD_TY
 my $INFO_FIELD_DELIMITER = ';';
 my $MISSING_LOF_VALUE  = '.'; #Value to put in for individuals who have no LoF-annotated variants in a transcript.
 
-
 my $USAGE = <<"Quid hodie cogitare debeo?";
 $PROGRAM_NAME version $VERSION
 Copyright 2015, $AUTHOR
@@ -165,7 +164,7 @@ sub update_SNP_lofs {
       next unless $transcript->{BIOTYPE} eq "protein_coding"; #Skip transcripts or other features that are not protein-coding according to ENSEMBL.
 
       if ( $transcript->{LoF} and $transcript->{LoF} eq "HC" ) { #High-confidence loss-of-function variant.
-	my $SNP_ID = join "\t" , ( $parsed_line->{id} , $transcript->{Consequence} , $transcript->{Gene} , $transcript->{SYMBOL} ); #E.g. "ENSG000123\tHLA-DRA\tENST01234"
+  my $SNP_ID = join "\t" , ( $parsed_line->{id} , $transcript->{Allele} , $transcript->{Consequence} , $transcript->{Gene} , $transcript->{SYMBOL} ); #E.g. "ENSG000123\tHLA-DRA\tENST01234"
 	my $LoF_string    = $parsed_line->{id} . '_' . $transcript->{Consequence}; #E.g. 'rs1234_stop_gained'.
 
 	my $individual_index = 0; #The index of the individual (human) whose genotype is under consideration.
