@@ -98,40 +98,39 @@ if [[ $# -lt 3 ]]; then
     echo ""
     script_arguments_error "You must supply at least [3] argument when running a counts file filteration!"
     echo ""
-    
+
 else
     ### REQUIRED | GENERALS
-    COUNTS_FILE="$1" 
+    COUNTS_FILE="$1"
     SAMPLE_LIST="$2"
     COUNTS_TYPE="$3"
     OUTPUT="$4"
-    
+
     ### TOOLS
-    GENE_FILT=/hpc/dhl_ec/aalasiri/scripts/WES_200K_LoF/data/run_loftk_phased_whites/ukb_WES_whites_LoF_output/filter_gene_counts.pl
-    SNP_FILT=/hpc/dhl_ec/aalasiri/scripts/WES_200K_LoF/data/run_loftk_phased_whites/ukb_WES_whites_LoF_output/filter_snp_counts.pl
+    FILTER=./bin/filter_samples_counts.pl
 
     ### PROJECT SPECIFIC
     ROOTDIR=./ # the root directory, e.g. /hpc/dhl_ec/aalasiri/lof/Imputation/ukb_5K/Imputation
 #    PROJECTNAME=${PROJECTNAME} # e.g. "ukb_5K"
 #    LOFTK=${LOFTOOLKIT}
-    
+
     ## GENE.COUNTS
     if [[ ${COUNTS_TYPE} == "genes" ]]; then
 	echo "Filteration will be applied on gene.counts file"
-	${GENE_FILT} ${SAMPLE_LIST} ${COUNTS_FILE} > ${OUTPUT}.gene.temp
+	${FILTER} ${SAMPLE_LIST} ${COUNTS_FILE} > ${OUTPUT}.gene.temp
 	SAMPE_SIZE=$(head -1 ${OUTPUT}.gene.temp | cut -f3- | wc -w)
-	
+
 	## Claculate 1-copy & 2-copy frequencies and combine all data
 	paste <(cut -f1-2 ${OUTPUT}.gene.temp) <(tail -n +2 ${OUTPUT}.gene.temp | cut -f3- | sed 's/[^1]//g' | awk -v sz=$SAMPE_SIZE '{ print length/sz }' | sed "1i1_copy_LoF_frequency") <(tail -n +2 ${OUTPUT}.gene.temp | cut -f3- | sed 's/[^2]//g' | awk -v sz=$SAMPE_SIZE '{ print length/sz }' | sed "1i2_copy_LoF_frequency") <(cut -f3- ${OUTPUT}.gene.temp) | awk '$3 != 0 || $4 != 0 {print $0}'  > ${OUTPUT}
 	rm ${OUTPUT}.gene.temp
 	echobold "DONE!"
-	
+
     ## SNP.COUNTS
     elif [[ ${COUNTS_TYPE} == "snps" ]]; then
 	echo "Filteration will be applied on snp.counts file"
-	${SNP_FILT} ${SAMPLE_LIST} ${COUNTS_FILE} > ${OUTPUT}.snp.temp
+	${FILTER} ${SAMPLE_LIST} ${COUNTS_FILE} > ${OUTPUT}.snp.temp
 	SAMPE_SIZE=$(head -1 ${OUTPUT}.snp.temp | cut -f6- | wc -w)
-	
+
 	## Claculate heterozygotes & homozygotes frequencies and combine all data
 	paste <(cut -f1-5 ${OUTPUT}.snp.temp) <(tail -n +2 ${OUTPUT}.snp.temp | cut -f6- | sed 's/[^1]//g' | awk -v sz=$SAMPE_SIZE '{ print length/sz }' | sed "1iheterozygous_LoF_frequency") <(tail -n +2 ${OUTPUT}.snp.temp | cut -f6- | sed 's/[^2]//g' | awk -v sz=$SAMPE_SIZE '{ print length/sz }' | sed "1ihomozygous_LoF_frequency") <(cut -f6- ${OUTPUT}.snp.temp) | awk '$3 != 0 || $4 != 0 {print $0}' > ${OUTPUT}
 	rm ${OUTPUT}.snp.temp
@@ -139,10 +138,10 @@ else
 
     else
 	echoerrorflash "                                     *** Oh no! Computer says no! ***"
-	echo ""	
+	echo ""
 	script_arguments_error "Please provide either [genes or snps] in the 3rd arguments! "
 	echo ""
-	
+
     fi
 
 

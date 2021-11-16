@@ -22,7 +22,6 @@ while (my $line = <$vin>) {
     next if $line =~ /^##/;
 	my @f = split /\s+/, $line;
 
-#    if ($f[0] eq 'gene_ID') {
     if (($f[0] eq 'gene_ID') || ($f[0] eq 'SNP_ID')) {
 	for my $k (keys %h) {
 	    push @indexes, indexes { $_ =~ /$k/ } @f;
