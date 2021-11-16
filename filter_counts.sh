@@ -122,7 +122,7 @@ else
         echo ""
         echoerrorflash "Claculation of 1-copy and 2-copy LoF genes frequency"
         paste <(cut -f1-2 ${OUTPUT}.gene.temp) <(tail -n +2 ${OUTPUT}.gene.temp | cut -f3- | sed 's/[^1]//g' | awk -v sz=$SAMPE_SIZE '{ print length/sz }' | sed "1i1_copy_LoF_frequency") <(tail -n +2 ${OUTPUT}.gene.temp | cut -f3- | sed 's/[^2]//g' | awk -v sz=$SAMPE_SIZE '{ print length/sz }' | sed "1i2_copy_LoF_frequency") <(cut -f3- ${OUTPUT}.gene.temp) | awk '$3 != 0 || $4 != 0 {print $0}'  > ${OUTPUT}
-        #rm ${OUTPUT}.gene.temp
+        rm ${OUTPUT}.gene.temp
         echobold "DONE!"
 
     ## SNP.COUNTS
@@ -136,7 +136,7 @@ else
         echo ""
         echoerrorflash "Claculation of heterozygotes & homozygotes LoF genes frequency"
         paste <(cut -f1-5 ${OUTPUT}.snp.temp) <(tail -n +2 ${OUTPUT}.snp.temp | cut -f6- | sed 's/[^1]//g' | awk -v sz=$SAMPE_SIZE '{ print length/sz }' | sed "1iheterozygous_LoF_frequency") <(tail -n +2 ${OUTPUT}.snp.temp | cut -f6- | sed 's/[^2]//g' | awk -v sz=$SAMPE_SIZE '{ print length/sz }' | sed "1ihomozygous_LoF_frequency") <(cut -f6- ${OUTPUT}.snp.temp) | awk '$6 != 0 || $7 != 0 {print $0}' > ${OUTPUT}
-        #rm ${OUTPUT}.snp.temp
+        rm ${OUTPUT}.snp.temp
         echo ""
         echobold "DONE!"
 
