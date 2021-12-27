@@ -12,6 +12,8 @@ LOFTK (Loss-of-Function ToolKit)
 [![DOI](https://img.shields.io/badge/DOI-10.1101%2F2021.08.09.455694-lightgrey)](https://doi.org/10.1101/2021.08.09.455694)
 [![License](https://img.shields.io/badge/license-CC--BY--SA--4.0-orange)](https://choosealicense.com/licenses/cc-by-sa-4.0)
 [![Version](https://img.shields.io/badge/Version-1.0.0-blue)](https://github.com/CirculatoryHealth/LoFTK)
+[![zenodo DOI](https://zenodo.org/badge/274101242.svg)](https://zenodo.org/badge/latestdoi/274101242)
+
 
 #### This readme
 > This readme accompanies the paper _"LOFTK: a framework for fully automated calculation of predicted Loss-of-Function variants."_ by [Alasiri A. *et al*. **bioRxiv 2021**](https://doi.org/10.1101/2021.08.09.455694).
