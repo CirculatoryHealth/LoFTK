@@ -68,10 +68,10 @@ bash run_loftk.sh $(pwd)/LoF.config
 **Always Remember**
 1. To set all options in the `LoF.config` file before the run
 2. To use the _full path_ to the configuration file, e.g. use `$(pwd)`.
-2. You can run LoFTK steps all in one run or separately by setting analysis type in the `LoF.config` file.
+2. You can run LoFTK steps all in one run or separately by setting **analysis type** in the `LoF.config` file.
 3. VEP and LOFTEE options can be added and modified in one of these configuration files in `./bin/`:
-  - [VEP_LOFTEE_GRCh37.config](bin/VEP_LOFTEE_GRCh37.config)
-  - [VEP_LOFTEE_GRCh38.config](bin/VEP_LOFTEE_GRCh37.config)
+  -- [VEP_LOFTEE_GRCh37.config](bin/VEP_LOFTEE_GRCh37.config)
+  -- [VEP_LOFTEE_GRCh38.config](bin/VEP_LOFTEE_GRCh37.config)
 
 
 
