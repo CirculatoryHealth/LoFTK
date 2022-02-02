@@ -146,6 +146,13 @@ _Version:_      v1.0.0</br>
 _Last update:_  2021-06-08</br>
 
 * v1.0.0 Initial version.
+* v1.0.1
+  - Add post LoFTK analysis
+    - [Merge](https://github.com/CirculatoryHealth/LoFTK#merge-the-counts-files-of-multiple-cohorts) and [Mismatched genes](https://github.com/CirculatoryHealth/LoFTK#mismatched-genes-between-samples)
+* v1.0.2
+  - What
+* v1.0.3
+  - What
 
 ### Contact
 
