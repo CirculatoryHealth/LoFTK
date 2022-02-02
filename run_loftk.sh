@@ -75,8 +75,8 @@ echobold "+                                                                     
 echobold "+                                                                                                       +"
 echobold "+ * Written by  : Abdulrahman Alasiri                                                                   +"
 echobold "+ * E-mail      : a.i.alasiri@umcutrecht.nl                                                             +"
-echobold "+ * Last update : 2021-06-17                                                                            +"
-echobold "+ * Version     : 1.0.0                                                                                 +"
+echobold "+ * Last update : 2022-01-31                                                                            +"
+echobold "+ * Version     : 1.0.3                                                                                 +"
 echobold "+                                                                                                       +"
 echobold "+ * Description : This script will set some directories, and execute LoF analysis                       +"
 echobold "+                 according to your specifications and using  your genotypes or sequencing data.        +"
@@ -105,20 +105,34 @@ else
     #MAILTYPE=${MAILSETTINGS}
 
     ### PROJECT SPECIFIC
+    ANALYSISTYPE=${ANALYSIS}
     ROOTDIR=${ROOTDIR} # the root directory, e.g. /hpc/dhl_ec/aalasiri/lof/Imputation/ukb_5K/Imputation
     PROJECTNAME=${PROJECTNAME} # e.g. "ukb_5K"
     LOFTK=${LOFTOOLKIT}
 
+    ### Insert VEP and LOFTEE to LoF_annotation.sh
+    cp ${LOFTK}/src/LoF_annotation_raw.sh ${LOFTK}/LoF_annotation.sh
+
+    if [ ${ASSEMBLY} == "GRCh37" ]; then
+	sed -i -e "/#@#@VEPLOFTEEPONTER37/r ${LOFTK}/bin/VEP_LOFTEE_GRCh37.config" ${LOFTK}/LoF_annotation.sh
+    elif [ ${ASSEMBLY} == "GRCh38" ]; then
+	sed -i -e "/#@#@VEPLOFTEEPONTER38/r ${LOFTK}/bin/VEP_LOFTEE_GRCh38.config" ${LOFTK}/LoF_annotation.sh
+    fi
+
+    ### START running LoFTK
     if [[ ${DATA_TYPE} == "genotype" ]] && [[ ${FILE_FORMAT} == "IMPUTE2" ]]; then
 	echo "LoFTK will analyze the ${DATA_TYPE} data that exist in ${FILE_FORMAT} files."
 	${LOFTK}/allele_to_vcf.sh ${CONFIGURATIONFILE}
 	${LOFTK}/LoF_annotation.sh ${CONFIGURATIONFILE}
+
     elif [[ ${DATA_TYPE} == "genotype" ]] && [[ ${FILE_FORMAT} == "VCF" ]]; then
 	echo "LoFTK will analyze the ${DATA_TYPE} data that exist in ${FILE_FORMAT} files."
 	${LOFTK}/LoF_annotation.sh ${CONFIGURATIONFILE}
-elif [[ ${DATA_TYPE} == "exome" || ${DATA_TYPE} == "genome" ]] && [[ ${FILE_FORMAT} == "VCF" ]]; then
+
+    elif [[ ${DATA_TYPE} == "exome" || ${DATA_TYPE} == "genome" ]] && [[ ${FILE_FORMAT} == "VCF" ]]; then
         echo "LoFTK will analyze the ${DATA_TYPE} data that exist in ${FILE_FORMAT} files."
 	${LOFTK}/LoF_annotation.sh ${CONFIGURATIONFILE}
+
     else
 	echo "We only perfomr analysis of genotyped data in IMPUTE2 and VCF input files, or sequencing [exome/genome] data in VCF only"
 	echo ""
