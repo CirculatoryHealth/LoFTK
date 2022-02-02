@@ -148,11 +148,12 @@ _Last update:_  2021-06-08</br>
 * v1.0.0 Initial version.
 * v1.0.1
   - Add post LoFTK analysis
-    - [Merge](https://github.com/CirculatoryHealth/LoFTK#merge-the-counts-files-of-multiple-cohorts) and [Mismatched genes](https://github.com/CirculatoryHealth/LoFTK#mismatched-genes-between-samples)
+    - [Merge](https://github.com/CirculatoryHealth/LoFTK#merge-the-counts-files-of-multiple-cohorts) and [Mismatched genes](https://github.com/CirculatoryHealth/LoFTK#mismatched-genes-between-samples).
 * v1.0.2
-  - What
+  - separate stat description from annotation script
 * v1.0.3
-  - What
+  - Run each step in LoFTK separately
+  - Add configuration file to modify VEP and LOFTEE options
 
 ### Contact
 
