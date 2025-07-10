@@ -141,6 +141,7 @@ sub parse_genotype {
   $genotype_string =~ s/:.*$//; #Strip away anything that isn't the genotype part.
 #  my @parsed_genotype = split /\|/ , $genotype_string; #Phased genotypes.
   my @parsed_genotype = split /[\|\/]/ , $genotype_string; #Phased genotypes.
+  push @parsed_genotype, '.' if @parsed_genotype == 1;
   return \@parsed_genotype;
 }
 
