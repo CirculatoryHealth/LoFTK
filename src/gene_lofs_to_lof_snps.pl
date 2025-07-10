@@ -81,7 +81,7 @@ sub main {
 
   while ( defined ( my $line = $gene_lofs->getline() ) ) {
     my $current_lof_snps = parse_line( \$line );
-    map { $lof_snps{ $_ } = $current_lof_snps->{ $_ } } keys $current_lof_snps; #Update.
+    map { $lof_snps{ $_ } = $current_lof_snps->{ $_ } } keys %$current_lof_snps; #Update.
   }
 
   $output->say( join "\t" , ( "SNP" , "frequency" ) );
